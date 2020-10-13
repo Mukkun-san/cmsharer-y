@@ -8,18 +8,6 @@ export default function Dashboard({ loggedout }) {
     let history = useHistory();
     console.log(loggedout);
 
-    useEffect(() => {
-        let email = window.sessionStorage.getItem("adminEmail");
-        let password = window.sessionStorage.getItem("adminPassword");
-        axios.post('https://cm-sharer.herokuapp.com/api/v1/admin/login', { email, password }).then((result) => {
-            if (!result.data.authorized) {
-                history.push("/admin/login")
-            }
-        }).catch((err) => {
-            console.log(err)
-        });
-    }, [])
-
     return (
         <div>
             <div className="row">
