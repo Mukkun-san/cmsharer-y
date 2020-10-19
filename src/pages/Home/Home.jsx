@@ -1,15 +1,13 @@
-import React, { useState, useEffect } from 'react'
+import React from 'react'
 import * as styles from './styles.module.css'
 import 'react-toastify/dist/ReactToastify.css';
-import { useHistory } from "react-router-dom";
-
-export default function Home({ handleAuthClick, user }) {
+import {
+    useHistory,
+    useLocation,
+  } from "react-router-dom";
+export default function Home({ handleAuthClick }) {
     let history = useHistory();
-    useEffect(() => {
-        if (user && user.wc) {
-            history.push("/account")
-        }
-    }, [user])
+
     return (
         <div className={`${styles.home}`}>
             <div className={`card text-center mt-5 p-4 pt-5 pb-5 pr-5 pl-4 ${styles.welcomeCard}`}>
