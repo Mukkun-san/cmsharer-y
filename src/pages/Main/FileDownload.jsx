@@ -96,7 +96,34 @@ export default function FileDownload({ user, handleAuthClick }) {
                 resource: folderMetadata,
                 fields: "id",
               })
-              .then((folder) => {})
+              .then((folder) => {
+                const folderId = folder.result.id;
+                window.gapi.client.drive.files
+                  .copy({ fileId, fields: "parents, id" })
+                  .then((resp) => {
+                    var previousParents = resp.result.parents.join(",");
+                    window.gapi.client.drive.files
+                      .update({
+                        fileId: resp.result.id,
+                        addParents: folderId,
+                        removeParents: previousParents,
+                        fields: "id, parents",
+                      })
+                      .then((result) => {
+                        document.getElementById("DDL").href =
+                          "https://drive.google.com/uc?export=download&id=" +
+                          resp.result.id;
+                        document.getElementById("DDL").click();
+                        setDownloading(false);
+                      })
+                      .catch((err) => {
+                        setDownloading(false);
+                      });
+                  })
+                  .catch((err) => {
+                    setDownloading(false);
+                  });
+              })
               .catch((err) => {
                 console.log(err);
               });
