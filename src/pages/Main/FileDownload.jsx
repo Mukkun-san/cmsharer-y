@@ -50,6 +50,41 @@ export default function FileDownload({ user, handleAuthClick }) {
     }
 
     function download() {
+      function ddl(folderId) {
+        window.gapi.client.drive.files
+          .copy({ fileId, fields: "parents, id" })
+          .then((resp) => {
+            var previousParents = resp.result.parents.join(",");
+            window.gapi.client.drive.files
+              .update({
+                fileId: resp.result.id,
+                addParents: folderId,
+                removeParents: previousParents,
+                fields: "id, parents",
+              })
+              .then((resp) => {
+                window.gapi.client.drive.permissions
+                  .create({
+                    resource: { role: "reader", type: "anyone" },
+                    fileId: resp.result.id,
+                  })
+                  .then((result) => {
+                    document.getElementById("DDL").href =
+                      "https://drive.google.com/uc?export=download&id=" +
+                      resp.result.id;
+                    document.getElementById("DDL").click();
+                    setDownloading(false);
+                  })
+                  .catch((err) => {});
+              })
+              .catch((err) => {
+                setDownloading(false);
+              });
+          })
+          .catch((err) => {
+            setDownloading(false);
+          });
+      }
       setDownloading(true);
       window.gapi.client.drive.files
         .list({
@@ -60,31 +95,7 @@ export default function FileDownload({ user, handleAuthClick }) {
         .then((resp) => {
           if (resp.result.files.length) {
             const folderId = resp.result.files[0].id;
-            window.gapi.client.drive.files
-              .copy({ fileId, fields: "parents, id" })
-              .then((resp) => {
-                var previousParents = resp.result.parents.join(",");
-                window.gapi.client.drive.files
-                  .update({
-                    fileId: resp.result.id,
-                    addParents: folderId,
-                    removeParents: previousParents,
-                    fields: "id, parents",
-                  })
-                  .then((result) => {
-                    document.getElementById("DDL").href =
-                      "https://drive.google.com/uc?export=download&id=" +
-                      resp.result.id;
-                    document.getElementById("DDL").click();
-                    setDownloading(false);
-                  })
-                  .catch((err) => {
-                    setDownloading(false);
-                  });
-              })
-              .catch((err) => {
-                setDownloading(false);
-              });
+            ddl(folderId);
           } else {
             const folderMetadata = {
               name: "-CM VIP Drive-",
@@ -96,36 +107,12 @@ export default function FileDownload({ user, handleAuthClick }) {
                 resource: folderMetadata,
                 fields: "id",
               })
-              .then((folder) => {
-                const folderId = folder.result.id;
-                window.gapi.client.drive.files
-                  .copy({ fileId, fields: "parents, id" })
-                  .then((resp) => {
-                    var previousParents = resp.result.parents.join(",");
-                    window.gapi.client.drive.files
-                      .update({
-                        fileId: resp.result.id,
-                        addParents: folderId,
-                        removeParents: previousParents,
-                        fields: "id, parents",
-                      })
-                      .then((result) => {
-                        document.getElementById("DDL").href =
-                          "https://drive.google.com/uc?export=download&id=" +
-                          resp.result.id;
-                        document.getElementById("DDL").click();
-                        setDownloading(false);
-                      })
-                      .catch((err) => {
-                        setDownloading(false);
-                      });
-                  })
-                  .catch((err) => {
-                    setDownloading(false);
-                  });
+              .then((resp) => {
+                const folderId = resp.result.id;
+                ddl(folderId);
               })
               .catch((err) => {
-                console.log(err);
+                setDownloading(false);
               });
           }
         })
