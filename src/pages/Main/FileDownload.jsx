@@ -200,7 +200,11 @@ export default function FileDownload({ user, handleAuthClick }) {
                 ) : (
                   <NotFound />
                 )}
-                <a href="" id="DDL" style={{ visibility: "hidden", height: 0 }}>
+                <a
+                  target="_blank"
+                  href=""
+                  id="DDL"
+                  style={{ visibility: "hidden", height: 0 }}>
                   download link placeholder
                 </a>
               </div>
