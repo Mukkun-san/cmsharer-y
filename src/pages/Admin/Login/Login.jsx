@@ -5,22 +5,17 @@ import { useHistory } from "react-router-dom";
 
 export default function Login() {
   const [accessToken, setAccessToken] = useState(
-    window.sessionStorage.getItem("adminToken") || null
+    window.localStorage.getItem("adminToken") || null
   );
   const history = useHistory();
-
-  useEffect(() => {
-    console.log(accessToken);
-  }, [accessToken]);
 
   useEffect(() => {
     authToken();
     async function authToken() {
       if (accessToken) {
-        let res = await axios.post(
-          API_URL + "/admin/authenticate",
-          accessToken
-        );
+        let res = await axios.post(API_URL + "/admin/authenticate", {
+          accessToken,
+        });
         if (res.data.authorized) {
           history.push("/admin/dashboard");
         }
@@ -37,10 +32,9 @@ export default function Login() {
       email,
       password,
     });
-    console.log(res.data);
     setError(res.data.error);
     if (res.data.authorized) {
-      window.sessionStorage.setItem("adminToken", res.data.accessToken);
+      window.localStorage.setItem("adminToken", res.data.accessToken);
       window.location.reload();
     }
   }

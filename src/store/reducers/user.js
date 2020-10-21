@@ -11,7 +11,6 @@ export const userSlice = createSlice({
     updateSigninStatus: (state) => {
       var currentUser = window.gapi.auth2.getAuthInstance().currentUser.get();
       state.details = currentUser;
-      console.log("updating", currentUser);
       if (!currentUser.wc) {
         state.loggedin = false;
       } else {

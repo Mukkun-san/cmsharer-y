@@ -22,7 +22,7 @@ export default function AdminNavBar() {
         <div
           className="ml-auto mr-5 btn"
           onClick={() => {
-            window.sessionStorage.removeItem("adminToken");
+            window.localStorage.removeItem("adminToken");
             window.location.reload();
           }}>
           <i className="mr-5"></i>

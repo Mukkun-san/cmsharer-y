@@ -1,17 +1,11 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { useSelector, useDispatch } from "react-redux";
-import { updateSigninStatus } from "../store/reducers/user";
 import axios from "axios";
 import { API_URL } from "../config";
 
-export default function NavBar() {
-  const currentUser = useSelector((state) => state.user.details);
-  const dispatch = useDispatch();
-
+export default function NavBar({ currentUser }) {
   function handleSignout() {
     window.gapi.auth2.getAuthInstance().signOut();
-    dispatch(updateSigninStatus());
     window.location.reload();
   }
   function handleAuthClick() {
@@ -26,12 +20,9 @@ export default function NavBar() {
           picture: res.nt.JJ,
         };
         await axios.post(API_URL + "/users/addOne", userdata);
-        updateSigninStatus();
         window.location.reload();
       })
-      .catch((err) => {
-        updateSigninStatus();
-      });
+      .catch((err) => {});
   }
 
   return (

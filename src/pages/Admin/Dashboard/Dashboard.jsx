@@ -1,16 +1,81 @@
-import React, { useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { dashboardCard } from "./.jsx";
+import { dashboardCard, Loader } from "./.jsx";
 import { useHistory } from "react-router-dom";
 import authenticate from "../Helpers/authenticate";
+import { toastError, toastWarning, toastSuccess } from "../Helpers/toasts";
+import axios from "axios";
+import { API_URL } from "../../../config/index.js";
 
 export default function Dashboard() {
   const history = useHistory();
+  const [link, setLink] = useState(null);
+  const [loading, setloading] = useState(false);
+  const [loadingMsg, setLoadingMsg] = useState("");
+  const [generatedLink, setGeneratedLink] = useState(null);
 
   useEffect(() => {
     authenticate(history);
   }, []);
 
+  async function generateLink() {
+    setGeneratedLink(false);
+    setLoadingMsg(false);
+    const linkRegExp = new RegExp("^https://drive.google.com/file/d/", "i");
+    if (!link) {
+      toastError("Enter a drive file link to generate");
+    } else if (!link.match(linkRegExp)) {
+      toastError("'" + link + "' is not a valid drive file link!");
+    } else {
+      let part1 = link.replace(linkRegExp, "");
+      const fileId = part1.substring(0, part1.indexOf("/"));
+      setloading(true);
+      setLoadingMsg("Checking Drive File Link...");
+      try {
+        let getfile = await axios.post(API_URL + "/drive/getFile", {
+          fileId,
+        });
+        if (getfile.data.fileExists) {
+          setLoadingMsg("Generating File Link");
+          try {
+            let addfile = await axios.post(API_URL + "/drive/addFile", {
+              ...getfile.data,
+            });
+            if (addfile.data.message) {
+              setTimeout(() => {
+                toastWarning(addfile.data.message);
+                setGeneratedLink(window.location.origin + "/drive/" + fileId);
+              }, 750);
+            } else {
+              addfile.data === "OK"
+                ? setTimeout(() => {
+                    toastSuccess("Link Successfully Generated.");
+                    setGeneratedLink(
+                      window.location.origin + "/drive/" + fileId
+                    );
+                  }, 750)
+                : setTimeout(() => {
+                    toastError(
+                      "Error Generating Link, please try again later."
+                    );
+                  }, 750);
+            }
+          } catch (error) {}
+          setTimeout(() => {
+            setLoadingMsg(false);
+            setloading(false);
+          }, 750);
+        } else {
+          setLoadingMsg(false);
+          setloading(false);
+          toastError("The file link in not working");
+        }
+      } catch (error) {
+        setloading(false);
+        toastError("The file link in not working");
+      }
+    }
+  }
   return (
     <div>
       <div className="row">
@@ -78,19 +143,44 @@ export default function Dashboard() {
                         aria-label="Sizing example input"
                         aria-describedby="inputGroup-sizing-lg"
                         placeholder="Enter Drive File Link to Generate DDL"
+                        value={link}
+                        onChange={(e) => setLink(e.target.value)}
                       />
                     </div>
                   </div>
                   <div className="col-3">
                     <button
                       id="downloadBtn"
-                      onClick={() => {}}
+                      onClick={() => {
+                        generateLink();
+                      }}
                       type="button"
                       className="btn btn-outline-info btn-block btn-lg">
-                      Download
+                      Generate Link
                     </button>
                   </div>
                 </div>
+                <div className="row">
+                  <div className="col">
+                    <div className="d-flex justify-content-center">
+                      {loading ? (
+                        <div>
+                          <Loader />
+                          <p className="d-inline ml-3">
+                            {loadingMsg}, Please wait..
+                          </p>
+                        </div>
+                      ) : null}
+                      {generatedLink ? (
+                        <p className="success">
+                          File Available at:{" "}
+                          <a href={generatedLink}>{generatedLink}</a>
+                        </p>
+                      ) : null}
+                    </div>
+                  </div>
+                </div>
+                <br />
               </div>
               <br />
               <br />

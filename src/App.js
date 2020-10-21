@@ -4,19 +4,19 @@ import {
   Switch,
   Route,
   Redirect,
-  useHistory,
-  useLocation,
 } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
-import Home from "./pages/Home/Home";
-import Account from "./pages/Home/Account";
-import Contact from "./pages/Home/Contact";
-import DMCA from "./pages/Home/DMCA";
-import Terms from "./pages/Home/Terms";
-import PrivacyPolicy from "./pages/Home/PrivacyPolicy";
+import FileDownload from "./pages/Main/FileDownload";
+import Home from "./pages/Main/Home";
+import Account from "./pages/Main/Account";
+import Contact from "./pages/Main/Contact";
+import DMCA from "./pages/Main/DMCA";
+import Terms from "./pages/Main/Terms";
+import PrivacyPolicy from "./pages/Main/PrivacyPolicy";
 import NotFound from "./pages/NotFound/NotFound";
 import AdminDashboard from "./pages/Admin/Dashboard/Dashboard";
 import DashboardUsers from "./pages/Admin/Dashboard/Users";
+import DashboardLinks from "./pages/Admin/Dashboard/Links";
 import AdminLogin from "./pages/Admin/Login/Login";
 import Loader from "./components/Loader";
 import NavBar from "./components/NavBar";
@@ -24,17 +24,11 @@ import AdminNavBar from "./components/AdminNavBar";
 import axios from "axios";
 import { API_URL } from "./config";
 import { CLIENT_ID, API_KEY, DISCOVERY_DOCS, SCOPES } from "./store/consts";
-import { updateSigninStatus } from "./store/reducers/user";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 export default function App() {
-  const currentUser = useSelector((state) => state.user.details);
   const [user, setUser] = useState(null);
-  const dispatch = useDispatch();
-
-  useEffect(() => {
-    console.log(user);
-  }, [user]);
-  console.log(user);
 
   function gapiInit() {
     try {
@@ -46,41 +40,29 @@ export default function App() {
           discoveryDocs: DISCOVERY_DOCS,
         })
         .then(() => {
-          function listener() {
-            setUser(window.gapi.auth2.getAuthInstance().currentUser.get());
-            dispatch(
-              updateSigninStatus(
-                window.gapi.auth2.getAuthInstance().currentUser.get()
-              )
-            );
-          }
-          window.gapi.auth2.getAuthInstance().isSignedIn.listen(listener());
-          setUser(window.gapi.auth2.getAuthInstance().currentUser.get());
+          let Oauth = window.gapi.auth2.getAuthInstance();
+          Oauth.isSignedIn.listen(setUser(Oauth.currentUser.get()));
+          setUser(Oauth.currentUser.get());
         });
-    } catch (e) {
-      console.log(e);
-    }
+    } catch (e) {}
   }
 
   function handleAuthClick() {
     window.gapi.auth2
       .getAuthInstance()
       .signIn()
-      .then(async (res) => {
+      .then(async (user) => {
         let userdata = {
-          uid: res.Ca,
-          username: res.nt.Ad,
-          email: res.nt.Wt,
-          picture: res.nt.JJ,
+          uid: user.getBasicProfile().getId(),
+          username: user.getBasicProfile().getName(),
+          email: user.getBasicProfile().getEmail(),
+          picture: user.getBasicProfile().getImageUrl(),
         };
         await axios.post(API_URL + "/users/addOne", userdata);
-        setUser(window.gapi.auth2.getAuthInstance().currentUser.get());
         window.location.reload();
-        console.log(window.gapi.auth2.getAuthInstance().currentUser.get());
-        dispatch(updateSigninStatus());
       })
       .catch((err) => {
-        dispatch(updateSigninStatus());
+        console.log(err);
       });
   }
 
@@ -97,8 +79,11 @@ export default function App() {
 
   return (
     <Router>
+      <ToastContainer />
       {!(window.gapi && user) ? (
-        <Loader />
+        <div className="col d-flex justify-content-center">
+          <Loader color="warning" />
+        </div>
       ) : (
         <div
           style={{
@@ -119,27 +104,35 @@ export default function App() {
               <AdminNavBar />
               <DashboardUsers />
             </Route>
+            <Route exact path="/admin/dashboard/links">
+              <AdminNavBar />
+              <DashboardLinks />
+            </Route>
             <Route path="/admin/">
               <Redirect to={{ pathname: "/admin/login" }} />
             </Route>
+            <Route exact path="/drive/:fileId">
+              <NavBar currentUser={user} />
+              <FileDownload user={user} handleAuthClick={handleAuthClick} />
+            </Route>
             <Route exact path="/privacy-policy">
-              <NavBar />
+              <NavBar currentUser={user} />
               <PrivacyPolicy />
             </Route>
             <Route exact path="/DMCA">
-              <NavBar />
+              <NavBar currentUser={user} />
               <DMCA />
             </Route>
             <Route exact path="/terms">
-              <NavBar />
+              <NavBar currentUser={user} />
               <Terms />
             </Route>
             <Route exact path="/contact">
-              <NavBar />
+              <NavBar currentUser={user} />
               <Contact />
             </Route>
             <Route exact path="/account">
-              <NavBar />
+              <NavBar currentUser={user} />
               {user && user.Ca ? (
                 <Account user={user} />
               ) : (
@@ -147,7 +140,7 @@ export default function App() {
               )}
             </Route>
             <Route exact path="/">
-              <NavBar />
+              <NavBar currentUser={user} />
               {user && user.Ca ? (
                 <Redirect to={{ pathname: "/account" }} />
               ) : (

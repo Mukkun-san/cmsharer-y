@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 
 export default function NotFound() {
   return (
-    <div className="container text-center w-100 pt-5 mt-5">
+    <div className="container text-center w-100 py-5 my-5">
       <div className="row">
         <div className="col-md-12">
           <div className={styles.errorTemplate}>

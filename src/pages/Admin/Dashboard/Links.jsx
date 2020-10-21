@@ -5,28 +5,27 @@ import axios from "axios";
 import { API_URL } from "../../../config";
 import Loader from "../../../components/Loader";
 
-export default function Users() {
+export default function Links() {
   const history = useHistory();
-  const [users, setUsers] = useState(null);
+  const [links, setLinks] = useState("");
 
   useEffect(() => {
     authenticate(history);
     axios
-      .get(API_URL + "/users/getAll")
+      .get(API_URL + "/links/getAll")
       .then((res) => {
         setTimeout(() => {
-          setUsers(res.data.users);
+          setLinks(res.data);
         }, 750);
       })
-      .catch((err) => {
-      });
+      .catch((err) => {});
   }, []);
 
   return (
     <div>
       <br />
       <br />
-      {users ? (
+      {links ? (
         <div className="row mx-5">
           <div className="col">
             <table className="table table-hover">
@@ -34,14 +33,14 @@ export default function Users() {
                 <tr>
                   <th className="text-center border border-light m-2">#</th>
                   <th className="text-center border border-light m-2">
-                    Picture
+                    File Name
+                  </th>
+                  <th className="text-center border border-light m-2">Link</th>
+                  <th className="text-center border border-light m-2">
+                    Number of Downloads
                   </th>
                   <th className="text-center border border-light m-2">
-                    Username
-                  </th>
-                  <th className="text-center border border-light m-2">Email</th>
-                  <th className="text-center border border-light m-2">
-                    Joined on Date
+                    Added on Date
                   </th>
                   <th className="text-center border border-light m-2">
                     Actions
@@ -49,27 +48,29 @@ export default function Users() {
                 </tr>
               </thead>
               <tbody>
-                {users.map((user, i) => {
+                {links.map((link, i) => {
                   return (
                     <tr>
                       <td className="bg-light">{i + 1}</td>
+                      <td className="bg-light">{link.fileName}</td>
                       <td className="bg-light">
-                        <img src={user.picture} alt="" />
+                        <a
+                          href={
+                            window.location.origin + "/drive/" + link.fileId
+                          }>
+                          {window.location.origin + "/drive/" + link.fileId}
+                        </a>
                       </td>
-                      <td className="bg-light">{user.username}</td>
-                      <td className="bg-light">{user.email}</td>
+                      <td className="bg-light">{link.downloads}</td>
                       <td className="bg-light">
-                        {user.joinedOn.toString().substring(0, 10)} at{" "}
-                        {user.joinedOn.toString().substring(11, 19)}
+                        {link.createdOn.toString().substring(0, 10)} at{" "}
+                        {link.createdOn.toString().substring(11, 19)}
                       </td>
                       <td className="bg-light">
-                        <button type="reset" className="btn btn-sm btn-dark">
-                          Blacklist
-                        </button>
                         <button
                           type="reset"
                           className="btn btn-sm ml-2 btn-danger">
-                          Delete
+                          Remove Link
                         </button>
                       </td>
                     </tr>
