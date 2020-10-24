@@ -1,25 +1,35 @@
 import React, { useState, useEffect } from "react";
-import authenticate from "../Helpers/authenticate";
-import { useHistory } from "react-router-dom";
 import axios from "axios";
-import { API_URL } from "../../../config";
+import { API_URL } from "../../../store/consts.js";
 import Loader from "../../../components/Loader";
+import { toastError, toastSuccess } from "../../../Helpers/toasts";
 
 export default function Links() {
-  const history = useHistory();
-  const [links, setLinks] = useState("");
+  const [links, setLinks] = useState(null);
 
   useEffect(() => {
-    authenticate(history);
     axios
       .get(API_URL + "/links/getAll")
       .then((res) => {
-        setTimeout(() => {
-          setLinks(res.data);
-        }, 750);
+        setLinks(res.data);
       })
-      .catch((err) => {});
+      .catch((err) => {
+        setLinks(false);
+      });
   }, []);
+
+  function removeLink(linkId) {
+    axios
+      .delete(API_URL + "/links/" + linkId)
+      .then((result) => {
+        console.log(result);
+        setLinks(links.filter((link) => link._id !== linkId));
+        toastSuccess("Link was successfully removed");
+      })
+      .catch((err) => {
+        toastError("Link could not be removed");
+      });
+  }
 
   return (
     <div>
@@ -50,7 +60,7 @@ export default function Links() {
               <tbody>
                 {links.map((link, i) => {
                   return (
-                    <tr>
+                    <tr key={"link" + i}>
                       <td className="bg-light">{i + 1}</td>
                       <td className="bg-light">{link.fileName}</td>
                       <td className="bg-light">
@@ -68,8 +78,10 @@ export default function Links() {
                       </td>
                       <td className="bg-light">
                         <button
+                          value={link._id}
                           type="reset"
-                          className="btn btn-sm ml-2 btn-danger">
+                          className="btn btn-sm ml-2 btn-danger"
+                          onClick={(e) => removeLink(e.target.value)}>
                           Remove Link
                         </button>
                       </td>
@@ -80,10 +92,12 @@ export default function Links() {
             </table>
           </div>
         </div>
-      ) : (
+      ) : links === null ? (
         <div className="col d-flex justify-content-center">
           <Loader color="warning" />
         </div>
+      ) : (
+        <h1>Internal Server Error</h1>
       )}
     </div>
   );

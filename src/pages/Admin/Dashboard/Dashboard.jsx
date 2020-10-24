@@ -1,21 +1,34 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { dashboardCard, Loader } from "./.jsx";
-import { useHistory } from "react-router-dom";
-import authenticate from "../Helpers/authenticate";
-import { toastError, toastWarning, toastSuccess } from "../Helpers/toasts";
+import {
+  toastError,
+  toastWarning,
+  toastSuccess,
+} from "../../../Helpers/toasts";
 import axios from "axios";
-import { API_URL } from "../../../config/index.js";
+import { API_URL } from "../../../store/consts.js";
 
 export default function Dashboard() {
-  const history = useHistory();
-  const [link, setLink] = useState(null);
-  const [loading, setloading] = useState(false);
+  const [link, setLink] = useState("");
+  const [loading, setloading] = useState(true);
   const [loadingMsg, setLoadingMsg] = useState("");
   const [generatedLink, setGeneratedLink] = useState(null);
+  const [stats, setStats] = useState({});
 
   useEffect(() => {
-    authenticate(history);
+    axios
+      .get(
+        API_URL + "/stats/getall/" + window.localStorage.getItem("adminToken")
+      )
+      .then((result) => {
+        setStats(result.data);
+        console.log(result);
+        setloading(false);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   }, []);
 
   async function generateLink() {
@@ -37,34 +50,28 @@ export default function Dashboard() {
         });
         if (getfile.data.fileExists) {
           setLoadingMsg("Generating File Link");
-          try {
-            let addfile = await axios.post(API_URL + "/drive/addFile", {
-              ...getfile.data,
-            });
-            if (addfile.data.message) {
-              setTimeout(() => {
-                toastWarning(addfile.data.message);
-                setGeneratedLink(window.location.origin + "/drive/" + fileId);
-              }, 750);
-            } else {
-              addfile.data === "OK"
-                ? setTimeout(() => {
-                    toastSuccess("Link Successfully Generated.");
-                    setGeneratedLink(
-                      window.location.origin + "/drive/" + fileId
-                    );
-                  }, 750)
-                : setTimeout(() => {
-                    toastError(
-                      "Error Generating Link, please try again later."
-                    );
-                  }, 750);
-            }
-          } catch (error) {}
+          let addfile = await axios.post(API_URL + "/drive/addFile", {
+            ...getfile.data,
+          });
+          if (addfile.data.message) {
+            setTimeout(() => {
+              toastWarning(addfile.data.message);
+              setGeneratedLink(window.location.origin + "/drive/" + fileId);
+            }, 250);
+          } else {
+            addfile.data === "OK"
+              ? setTimeout(() => {
+                  toastSuccess("Link Successfully Generated.");
+                  setGeneratedLink(window.location.origin + "/drive/" + fileId);
+                }, 250)
+              : setTimeout(() => {
+                  toastError("Error Generating Link, please try again later.");
+                }, 250);
+          }
           setTimeout(() => {
             setLoadingMsg(false);
             setloading(false);
-          }, 750);
+          }, 250);
         } else {
           setLoadingMsg(false);
           setloading(false);
@@ -99,22 +106,22 @@ export default function Dashboard() {
                   <Link
                     to="/admin/dashboard/users"
                     style={{ textDecoration: "none" }}>
-                    {dashboardCard("user--v1.png", "Users", 0)}
+                    {dashboardCard("user--v1.png", "Users", stats.users)}
                   </Link>
                 </div>
                 <div className="col col-sm-12 col-md-3 ml-auto mr-auto">
                   <Link
                     to="/admin/dashboard/links"
                     style={{ textDecoration: "none" }}>
-                    {dashboardCard("folder-invoices.png", "Links", 0)}
+                    {dashboardCard("folder-invoices.png", "Links", stats.links)}
                   </Link>
                 </div>
                 <div className="col col-sm-12 col-md-3 ml-auto mr-auto">
-                  <Link
-                    to="/admin/dashboard/downloads"
-                    style={{ textDecoration: "none" }}>
-                    {dashboardCard("download-from-cloud.png", "Downloads", 0)}
-                  </Link>
+                  {dashboardCard(
+                    "download-from-cloud.png",
+                    "Downloads",
+                    stats.downloads
+                  )}
                 </div>
               </div>
               <br />

@@ -1,7 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
-import { API_URL } from "../config";
+import { API_URL } from "../store/consts.js";
 
 export default function NavBar({ currentUser }) {
   function handleSignout() {
@@ -27,7 +27,7 @@ export default function NavBar({ currentUser }) {
 
   return (
     <div>
-      <nav className="navbar navbar-dark bg-dark navbar-expand-xl navbar-light bg-light py-3">
+      <nav className="navbar navbar-dark bg-dark navbar-expand-xl">
         <i className="mr-5"></i>
         <Link className="navbar-brand" to="/">
           <h2>CM Sharer</h2>
@@ -45,6 +45,11 @@ export default function NavBar({ currentUser }) {
         <div className="collapse navbar-collapse" id="navbarNav">
           <ul className="navbar-nav ml-auto">
             <li className="nav-item ml-3">
+              <Link className="nav-link" to="/terms&conditions">
+                Terms & Conditions
+              </Link>
+            </li>
+            <li className="nav-item ml-3">
               <Link className="nav-link" to="/privacy-policy">
                 Privacy Policy
               </Link>
@@ -52,11 +57,6 @@ export default function NavBar({ currentUser }) {
             <li className="nav-item ml-3">
               <Link className="nav-link" to="/DMCA">
                 DMCA
-              </Link>
-            </li>
-            <li className="nav-item ml-3">
-              <Link className="nav-link" to="/terms">
-                Terms & Conditions
               </Link>
             </li>
             <li className="nav-item ml-3">

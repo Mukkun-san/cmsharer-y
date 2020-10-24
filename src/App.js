@@ -5,7 +5,6 @@ import {
   Route,
   Redirect,
 } from "react-router-dom";
-import { useSelector, useDispatch } from "react-redux";
 import FileDownload from "./pages/Main/FileDownload";
 import Home from "./pages/Main/Home";
 import Account from "./pages/Main/Account";
@@ -18,17 +17,19 @@ import AdminDashboard from "./pages/Admin/Dashboard/Dashboard";
 import DashboardUsers from "./pages/Admin/Dashboard/Users";
 import DashboardLinks from "./pages/Admin/Dashboard/Links";
 import AdminLogin from "./pages/Admin/Login/Login";
+import AdminAccount from "./pages/Admin/Pages/Account";
 import Loader from "./components/Loader";
 import NavBar from "./components/NavBar";
 import AdminNavBar from "./components/AdminNavBar";
 import axios from "axios";
-import { API_URL } from "./config";
+import { API_URL } from "./store/consts.js";
 import { CLIENT_ID, API_KEY, DISCOVERY_DOCS, SCOPES } from "./store/consts";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 export default function App() {
   const [user, setUser] = useState(null);
+  const [adminIsLoggedin, setAdminIsLoggedin] = useState(null);
 
   function gapiInit() {
     try {
@@ -75,12 +76,26 @@ export default function App() {
     script.onload = handleClientLoad;
     script.src = "https://apis.google.com/js/api.js";
     document.body.appendChild(script);
+
+    adminAuth();
   });
+
+  async function adminAuth() {
+    const accessToken = window.localStorage.getItem("adminToken") || null;
+    let res = await axios.post(API_URL + "/admin/authorize", {
+      accessToken,
+    });
+    if (res.data && res.data.authorized) {
+      setAdminIsLoggedin(true);
+    } else {
+      setAdminIsLoggedin(false);
+    }
+  }
 
   return (
     <Router>
       <ToastContainer />
-      {!(window.gapi && user) ? (
+      {!(window.gapi && user) || adminIsLoggedin === null ? (
         <div className="col d-flex justify-content-center">
           <Loader color="warning" />
         </div>
@@ -92,21 +107,45 @@ export default function App() {
           {/* A <Switch> looks through its children <Route>s and
             renders the first one that matches the current URL. */}
           <Switch>
-            <Route exact path="/admin/login">
-              <AdminNavBar />
-              <AdminLogin />
-            </Route>
             <Route exact path="/admin/dashboard">
-              <AdminNavBar />
-              <AdminDashboard />
+              <AdminNavBar adminIsLoggedin={adminIsLoggedin} />
+              {adminIsLoggedin ? (
+                <AdminDashboard />
+              ) : (
+                <Redirect to={{ pathname: "/admin/login" }} />
+              )}
             </Route>
             <Route exact path="/admin/dashboard/users">
-              <AdminNavBar />
-              <DashboardUsers />
+              <AdminNavBar adminIsLoggedin={adminIsLoggedin} />
+              {adminIsLoggedin ? (
+                <DashboardUsers />
+              ) : (
+                <Redirect to={{ pathname: "/admin/login" }} />
+              )}
             </Route>
             <Route exact path="/admin/dashboard/links">
-              <AdminNavBar />
-              <DashboardLinks />
+              <AdminNavBar adminIsLoggedin={adminIsLoggedin} />
+              {adminIsLoggedin ? (
+                <DashboardLinks />
+              ) : (
+                <Redirect to={{ pathname: "/admin/login" }} />
+              )}
+            </Route>
+            <Route exact path="/admin/account">
+              <AdminNavBar adminIsLoggedin={adminIsLoggedin} />
+              {adminIsLoggedin ? (
+                <AdminAccount />
+              ) : (
+                <Redirect to={{ pathname: "/admin/login" }} />
+              )}
+            </Route>
+            <Route exact path="/admin/login">
+              <AdminNavBar adminIsLoggedin={adminIsLoggedin} />
+              {!adminIsLoggedin ? (
+                <AdminLogin />
+              ) : (
+                <Redirect to={{ pathname: "/admin/dashboard" }} />
+              )}
             </Route>
             <Route path="/admin/">
               <Redirect to={{ pathname: "/admin/login" }} />
@@ -123,7 +162,7 @@ export default function App() {
               <NavBar currentUser={user} />
               <DMCA />
             </Route>
-            <Route exact path="/terms">
+            <Route exact path="/terms&conditions">
               <NavBar currentUser={user} />
               <Terms />
             </Route>

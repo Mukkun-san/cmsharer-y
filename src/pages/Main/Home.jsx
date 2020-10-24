@@ -12,35 +12,34 @@ export default function Home({ handleAuthClick }) {
             WELCOME TO <b>CM Sharer</b>!
           </h3>
           <br />
+          <p>Easily share Google Drive files with anyone! Upload and Share</p>
+          <strong>CM Sharer is 100% free &amp; Easy to use</strong>
+          <p>
+            Simple. CM Sharer is a sharing tool. We offer online file and folder
+            manager, and it's also uploading and downloading tools. With CM
+            Sharer, you can share all your personal files on the same place. We
+            guarantee that all your google drive informations and files are kept
+            securely on our server and we will never release your information
+            unknownly. For more information
+          </p>
           <p>Just Login to your google account to use our service.</p>
-          <div
-            className="d-flex justify-content-center d-inline"
-            onClick={() => {
-              handleAuthClick();
-            }}>
-            <div className="w-auto pr-5 pl-5 d-flex btn btn-light">
+          <div className="d-flex justify-content-center d-inline">
+            <div
+              className="w-auto pr-5 pl-5 d-flex btn btn-light"
+              onClick={handleAuthClick}>
               <img
-                style={{ height: "2.5rem" }}
                 alt=""
                 src="https://img.icons8.com/plasticine/100/000000/google-logo.png"
-              />
-              <p className="ml-4 mt-2">Login With Google</p>
+                style={{ height: "2.5rem" }}></img>
+              <p className="ml-4 mt-2">Sign Up With Google</p>
             </div>
           </div>
-
           <img
             className="img-fluid w-50"
             src="https://cdn.dribbble.com/users/1279501/screenshots/4922374/illustration.png"
             alt=""
-            srcSet=""
-          />
+            srcset=""></img>
           <br />
-          <p>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut bibendum
-            sapien lectus, id cursus elit venenatis mattis. Nullam vestibulum
-            dolor mauris, nec ullamcorper augue commodo sit amet. Aliquam erat
-            volutpat.
-          </p>
         </div>
       </div>
     </div>

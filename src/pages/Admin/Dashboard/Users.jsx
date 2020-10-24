@@ -1,26 +1,32 @@
 import React, { useState, useEffect } from "react";
-import authenticate from "../Helpers/authenticate";
-import { useHistory } from "react-router-dom";
 import axios from "axios";
-import { API_URL } from "../../../config";
+import { API_URL } from "../../../store/consts.js";
 import Loader from "../../../components/Loader";
+import { toastError, toastSuccess } from "../../../Helpers/toasts";
 
 export default function Users() {
-  const history = useHistory();
   const [users, setUsers] = useState(null);
 
   useEffect(() => {
-    authenticate(history);
     axios
       .get(API_URL + "/users/getAll")
       .then((res) => {
-        setTimeout(() => {
-          setUsers(res.data.users);
-        }, 750);
+        setUsers(res.data.users);
+      })
+      .catch((err) => {});
+  }, []);
+
+  function removeUser(_id) {
+    axios
+      .delete(API_URL + "/users/" + _id)
+      .then((result) => {
+        setUsers(users.filter((user) => user._id !== _id));
+        toastSuccess("User was successfully removed");
       })
       .catch((err) => {
+        toastError("User could not be removed");
       });
-  }, []);
+  }
 
   return (
     <div>
@@ -51,7 +57,7 @@ export default function Users() {
               <tbody>
                 {users.map((user, i) => {
                   return (
-                    <tr>
+                    <tr key={user.guid}>
                       <td className="bg-light">{i + 1}</td>
                       <td className="bg-light">
                         <img src={user.picture} alt="" />
@@ -67,8 +73,10 @@ export default function Users() {
                           Blacklist
                         </button>
                         <button
-                          type="reset"
-                          className="btn btn-sm ml-2 btn-danger">
+                          value={user.guid}
+                          type="button"
+                          className="btn btn-sm ml-2 btn-danger"
+                          onClick={(e) => removeUser(e.target.value)}>
                           Delete
                         </button>
                       </td>

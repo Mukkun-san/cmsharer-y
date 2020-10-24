@@ -1,42 +1,29 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { API_URL } from "../../../config";
-import { useHistory } from "react-router-dom";
+import { API_URL } from "../../../store/consts.js";
 
 export default function Login() {
-  const [accessToken, setAccessToken] = useState(
-    window.localStorage.getItem("adminToken") || null
-  );
-  const history = useHistory();
-
-  useEffect(() => {
-    authToken();
-    async function authToken() {
-      if (accessToken) {
-        let res = await axios.post(API_URL + "/admin/authenticate", {
-          accessToken,
-        });
-        if (res.data.authorized) {
-          history.push("/admin/dashboard");
-        }
-      }
-    }
-  }, []);
-
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState(null);
+  const [message, setMessage] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   async function Login() {
+    setLoading(true);
     let res = await axios.post(API_URL + "/admin/login", {
       email,
       password,
     });
-    setError(res.data.error);
     if (res.data.authorized) {
       window.localStorage.setItem("adminToken", res.data.accessToken);
+      window.localStorage.setItem("admin", email);
       window.location.reload();
     }
+    setLoading(false);
+    setMessage(res.data.message);
+    setTimeout(() => {
+      setMessage("");
+    }, 2000);
   }
   return (
     <div>
@@ -81,16 +68,24 @@ export default function Login() {
                   }}
                 />
               </div>
-              {error ? (
-                <p className=" alert-danger badge-danger text-center p-2">
-                  {error}
+
+              <div className="d-flex justify-content-center">
+                {!loading ? (
+                  <button type="submit" className="btn btn-primary px-5">
+                    Login
+                  </button>
+                ) : (
+                  <button disabled className="btn bg-light px-5">
+                    Login
+                  </button>
+                )}
+              </div>
+
+              {message ? (
+                <p className="my-3 alert-danger badge-danger text-center p-2">
+                  {message}
                 </p>
               ) : null}
-              <div className="d-flex justify-content-center">
-                <button type="submit" className="btn btn-primary">
-                  Submit
-                </button>
-              </div>
             </form>
           </div>
         </div>

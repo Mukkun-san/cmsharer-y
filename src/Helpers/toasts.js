@@ -1,9 +1,12 @@
 import { toast } from "react-toastify";
 
-function toastError(msg, type) {
+function toastError(msg, position) {
+  if (!position) {
+    position = "top-center";
+  }
   toast.error(msg, {
     position: "top-center",
-    autoClose: 5000,
+    autoClose: 3000,
     hideProgressBar: true,
     closeOnClick: true,
     pauseOnHover: true,
@@ -12,10 +15,13 @@ function toastError(msg, type) {
   });
 }
 
-function toastWarning(msg, type) {
+function toastWarning(msg, position) {
+  if (!position) {
+    position = "top-center";
+  }
   toast.warning(msg, {
-    position: "top-center",
-    autoClose: 5000,
+    position,
+    autoClose: 3000,
     hideProgressBar: true,
     closeOnClick: true,
     pauseOnHover: true,
@@ -24,10 +30,13 @@ function toastWarning(msg, type) {
   });
 }
 
-function toastSuccess(msg, type) {
+function toastSuccess(msg, position) {
+  if (!position) {
+    position = "top-center";
+  }
   toast.success(msg, {
     position: "top-center",
-    autoClose: 5000,
+    autoClose: 3000,
     hideProgressBar: true,
     closeOnClick: true,
     pauseOnHover: true,

@@ -1,3 +1,7 @@
+const API_URL = "https://cmshare.herokuapp.com/api/v1"; // https://localhost:4545  // https://cmshare.herokuapp.com
+
+const DRIVE_FOLDER_NAME = "CM Sharer";
+
 const CLIENT_ID =
   "217494060995-4h0bo966ba4ei2up0tj6ujv5b1rkhf2r.apps.googleusercontent.com";
 const API_KEY = "AIzaSyAQKkijRTyWPzK34TsgE2LyDlX-BxHDMNY";
@@ -6,4 +10,11 @@ const DISCOVERY_DOCS = [
 ];
 const SCOPES = "https://www.googleapis.com/auth/drive";
 
-export { CLIENT_ID, API_KEY, DISCOVERY_DOCS, SCOPES };
+export {
+  API_URL,
+  CLIENT_ID,
+  API_KEY,
+  DISCOVERY_DOCS,
+  SCOPES,
+  DRIVE_FOLDER_NAME,
+};

@@ -1,28 +1,34 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useParams } from "react-router-dom";
-import { API_URL } from "../../config";
+import { API_URL, DRIVE_FOLDER_NAME } from "../../store/consts.js";
 import NotFound from "../NotFound/NotFound";
 import Loader from "../../components/Loader";
 import prettyBytes from "pretty-bytes";
 
 export default function FileDownload({ user, handleAuthClick }) {
   let { fileId } = useParams();
-  const [file, setFile] = useState();
-  const [loading, setLoading] = useState(false);
+  const [file, setFile] = useState(null);
+  const [loading, setLoading] = useState(true);
   const [downloading, setDownloading] = useState(false);
 
   useEffect(() => {
-    async function getFile() {
-      let result = await axios.post(API_URL + "/drive/getFile", { fileId });
-      if (result.data.file) {
-        setFile(result.data.file);
-      }
-      setLoading(false);
-    }
     setLoading(true);
     if (fileId) {
       getFile();
+    }
+    async function getFile() {
+      try {
+        let result = await axios.post(API_URL + "/drive/getFile", { fileId });
+        if (result.data.fileExists) {
+          setFile(result.data.file);
+        } else {
+          setFile(false);
+        }
+        setLoading(false);
+      } catch (error) {
+        setLoading(false);
+      }
     }
   }, [fileId]);
 
@@ -50,55 +56,53 @@ export default function FileDownload({ user, handleAuthClick }) {
     }
 
     function download() {
-      function ddl(folderId) {
-        window.gapi.client.drive.files
-          .copy({ fileId, fields: "parents, id" })
-          .then((resp) => {
-            var previousParents = resp.result.parents.join(",");
-            window.gapi.client.drive.files
-              .update({
-                fileId: resp.result.id,
-                addParents: folderId,
-                removeParents: previousParents,
-                fields: "id, parents",
-              })
-              .then((resp) => {
-                window.gapi.client.drive.permissions
-                  .create({
-                    resource: { role: "reader", type: "anyone" },
-                    fileId: resp.result.id,
-                  })
-                  .then((result) => {
-                    document.getElementById("DDL").href =
-                      "https://drive.google.com/uc?export=download&id=" +
-                      resp.result.id;
-                    document.getElementById("DDL").click();
-                    setDownloading(false);
-                  })
-                  .catch((err) => {});
-              })
-              .catch((err) => {
-                setDownloading(false);
-              });
-          })
-          .catch((err) => {
-            setDownloading(false);
+      async function ddl(folderId) {
+        try {
+          let response = await window.gapi.client.drive.files.copy({
+            fileId,
+            fields: "parents, id",
           });
+          const previousParents = response.result.parents.join(",");
+          response = await window.gapi.client.drive.files.update({
+            fileId: response.result.id,
+            addParents: folderId,
+            removeParents: previousParents,
+            fields: "id, parents",
+          });
+          await window.gapi.client.drive.permissions.create({
+            resource: { role: "reader", type: "anyone" },
+            fileId: response.result.id,
+          });
+          await axios.post(API_URL + "/links/downloadOne", {
+            fileId,
+            userId: window.gapi.auth2
+              .getAuthInstance()
+              .currentUser.get()
+              .getBasicProfile()
+              .getId(),
+          });
+          document.getElementById("DDL").href =
+            "https://drive.google.com/uc?export=download&id=" +
+            response.result.id;
+          document.getElementById("DDL").click();
+          setDownloading(false);
+        } catch (error) {
+          setDownloading(false);
+        }
       }
       setDownloading(true);
       window.gapi.client.drive.files
         .list({
-          q:
-            "mimeType='application/vnd.google-apps.folder' and name='-CM VIP Drive-'",
-          fields: "nextPageToken, files(id, name)",
+          q: `mimeType='application/vnd.google-apps.folder' and name='${DRIVE_FOLDER_NAME}'`,
+          fields: "nextPageToken, files(id, name, trashed)",
         })
         .then((resp) => {
-          if (resp.result.files.length) {
+          if (resp.result.files.length && !resp.result.files[0].trashed) {
             const folderId = resp.result.files[0].id;
             ddl(folderId);
           } else {
             const folderMetadata = {
-              name: "-CM VIP Drive-",
+              name: DRIVE_FOLDER_NAME,
               mimeType: "application/vnd.google-apps.folder",
               folderColorRgb: "#ff7537",
             };
@@ -164,7 +168,7 @@ export default function FileDownload({ user, handleAuthClick }) {
           <div className="col-8 mx-auto">
             <div className="card card-signin my-5">
               <div className="card-body">
-                {loading ? (
+                {loading || file === null || !user ? (
                   <div className="col d-flex justify-content-center">
                     <Loader color="warning" />
                   </div>
