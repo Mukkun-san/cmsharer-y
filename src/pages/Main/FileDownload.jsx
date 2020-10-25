@@ -19,7 +19,7 @@ export default function FileDownload({ user, handleAuthClick }) {
     }
     async function getFile() {
       try {
-        let result = await axios.post(API_URL + "/drive/getFile", { fileId });
+        let result = await axios.post(API_URL + "/links/getFile", { fileId });
         if (result.data.fileExists) {
           setFile(result.data.file);
         } else {

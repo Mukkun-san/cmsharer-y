@@ -1,6 +1,6 @@
 import React from "react";
 
-function dashboardCard(icon, title, count) {
+function DashboardCard({ icon, title, count }) {
   return (
     <div className="card text-center p-4 btn btn-light">
       <div className="card-content">
@@ -18,7 +18,7 @@ function dashboardCard(icon, title, count) {
   );
 }
 
-function Loader() {
+function LinkLoader() {
   return (
     <div className="spinner-border" role="status">
       <span className="sr-only">Loading...</span>
@@ -26,4 +26,4 @@ function Loader() {
   );
 }
 
-export { dashboardCard, Loader };
+export { DashboardCard, LinkLoader };

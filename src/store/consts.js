@@ -1,4 +1,4 @@
-const API_URL = "https://cmshare.herokuapp.com/api/v1"; // https://localhost:4545  // https://cmshare.herokuapp.com
+const API_URL = "https://cmshare.herokuapp.com/api/v1"; // http://localhost:4545  // https://cmshare.herokuapp.com
 
 const DRIVE_FOLDER_NAME = "CM Sharer";
 

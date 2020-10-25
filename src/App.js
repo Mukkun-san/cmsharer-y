@@ -18,6 +18,7 @@ import DashboardUsers from "./pages/Admin/Dashboard/Users";
 import DashboardLinks from "./pages/Admin/Dashboard/Links";
 import AdminLogin from "./pages/Admin/Login/Login";
 import AdminAccount from "./pages/Admin/Pages/Account";
+import AddLinks from "./pages/Admin/Pages/AddLinks";
 import Loader from "./components/Loader";
 import NavBar from "./components/NavBar";
 import AdminNavBar from "./components/AdminNavBar";
@@ -107,14 +108,6 @@ export default function App() {
           {/* A <Switch> looks through its children <Route>s and
             renders the first one that matches the current URL. */}
           <Switch>
-            <Route exact path="/admin/dashboard">
-              <AdminNavBar adminIsLoggedin={adminIsLoggedin} />
-              {adminIsLoggedin ? (
-                <AdminDashboard />
-              ) : (
-                <Redirect to={{ pathname: "/admin/login" }} />
-              )}
-            </Route>
             <Route exact path="/admin/dashboard/users">
               <AdminNavBar adminIsLoggedin={adminIsLoggedin} />
               {adminIsLoggedin ? (
@@ -127,6 +120,22 @@ export default function App() {
               <AdminNavBar adminIsLoggedin={adminIsLoggedin} />
               {adminIsLoggedin ? (
                 <DashboardLinks />
+              ) : (
+                <Redirect to={{ pathname: "/admin/login" }} />
+              )}
+            </Route>
+            <Route exact path="/admin/add-links">
+              <AdminNavBar adminIsLoggedin={adminIsLoggedin} />
+              {adminIsLoggedin ? (
+                <AddLinks />
+              ) : (
+                <Redirect to={{ pathname: "/admin/login" }} />
+              )}
+            </Route>
+            <Route path="/admin/dashboard">
+              <AdminNavBar adminIsLoggedin={adminIsLoggedin} />
+              {adminIsLoggedin ? (
+                <AdminDashboard />
               ) : (
                 <Redirect to={{ pathname: "/admin/login" }} />
               )}

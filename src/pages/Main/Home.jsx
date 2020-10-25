@@ -38,7 +38,7 @@ export default function Home({ handleAuthClick }) {
             className="img-fluid w-50"
             src="https://cdn.dribbble.com/users/1279501/screenshots/4922374/illustration.png"
             alt=""
-            srcset=""></img>
+            srcSet=""></img>
           <br />
         </div>
       </div>

@@ -26,8 +26,17 @@ export default function AdminNavBar({ adminIsLoggedin }) {
         {adminIsLoggedin ? (
           <div className="collapse navbar-collapse" id="navbarNav">
             <ul className="navbar-nav ml-auto">
-              <li className="my-auto ml-5"></li>
-              <li className="my-auto ml-5">
+              <li className="my-auto ml-4">
+                <Link className="btn btn-link" to="/admin/add-links">
+                  <img
+                    alt="logout"
+                    src="https://img.icons8.com/material-outlined/26/ffffff/guest-male.png"></img>
+                  <h5 className="font-weight-normal text-white">
+                    Generate Links
+                  </h5>
+                </Link>
+              </li>
+              <li className="my-auto ml-4">
                 <Link className="btn btn-link my-auto" to="/admin/account">
                   <img
                     alt="logout"
@@ -35,7 +44,7 @@ export default function AdminNavBar({ adminIsLoggedin }) {
                   <h5 className="font-weight-normal text-white">Account</h5>
                 </Link>
               </li>
-              <li className="my-auto ml-5">
+              <li className="my-auto ml-4">
                 <div
                   className="mr-5 btn btn-link my-auto"
                   onClick={() => {

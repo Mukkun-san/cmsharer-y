@@ -1,0 +1,10 @@
+.textSize {
+  @media screen and (max-width: 992px) {
+    h3 {
+      font-size: large;
+    }
+    img {
+      width: 40px;
+    }
+  }
+}
