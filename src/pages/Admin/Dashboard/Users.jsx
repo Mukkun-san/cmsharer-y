@@ -73,7 +73,7 @@ export default function Users() {
                           Blacklist
                         </button>
                         <button
-                          value={user.guid}
+                          value={user._id}
                           type="button"
                           className="btn btn-sm ml-2 btn-danger"
                           onClick={(e) => removeUser(e.target.value)}>
