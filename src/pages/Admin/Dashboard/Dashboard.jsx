@@ -21,12 +21,11 @@ export default function Dashboard() {
 
   useEffect(() => {
     axios
-      .get(
-        API_URL + "/stats/getall/" + window.localStorage.getItem("adminToken")
-      )
+      .post(API_URL + "/stats/getall", {
+        accessToken: window.localStorage.getItem("adminToken"),
+      })
       .then((result) => {
         setStats(result.data);
-        console.log(result);
         setLoading(false);
       })
       .catch((err) => {
