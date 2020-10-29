@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { API_URL } from "../../../store/consts";
+import { API_URL, ADMIN_TOKEN } from "../../../store/consts";
 import Loader from "../../../components/Loader";
 import {
   toastError,
@@ -22,9 +22,12 @@ export default function Account() {
   const [updateInfo, setUpdateInfo] = useState(emptyInfo);
 
   useEffect(() => {
-    const accessToken = window.localStorage.getItem("adminToken");
     axios
-      .post(API_URL + "/admin/getProfile", { accessToken, email: admin.email })
+      .post(
+        API_URL + "/admin/getProfile",
+        { email: admin.email },
+        { headers: { authorization: ADMIN_TOKEN } }
+      )
       .then((res) => {
         setAdmin(res.data);
       })
@@ -32,11 +35,14 @@ export default function Account() {
   }, []);
 
   async function updateUsername() {
-    let res = await axios.post(API_URL + "/admin/update/username", {
-      accessToken: window.localStorage.getItem("adminToken"),
-      email: admin.email,
-      username: updateInfo.username,
-    });
+    let res = await axios.post(
+      API_URL + "/admin/update/username",
+      {
+        email: admin.email,
+        username: updateInfo.username,
+      },
+      { headers: { authorization: ADMIN_TOKEN } }
+    );
     console.log(res);
     if (res.data === "OK") {
       setAdmin({ ...admin, username: updateInfo.username });
@@ -54,12 +60,15 @@ export default function Account() {
   async function updatePassword() {
     if (validForm()) {
       await axios
-        .post(API_URL + "/admin/update/password", {
-          accessToken: window.localStorage.getItem("adminToken"),
-          email: admin.email,
-          oldPassw: updateInfo.oldPassw,
-          newPassw: updateInfo.newPassw,
-        })
+        .post(
+          API_URL + "/admin/update/password",
+          {
+            email: admin.email,
+            oldPassw: updateInfo.oldPassw,
+            newPassw: updateInfo.newPassw,
+          },
+          { headers: { authorization: ADMIN_TOKEN } }
+        )
         .then((res) => {
           if (res.data.error) {
             toastError(res.data.error);
@@ -132,11 +141,14 @@ export default function Account() {
       if (pass1 === pass2) {
         setLoading(true);
         try {
-          let res = await axios.post(API_URL + "/admin/addaccount", {
-            accessToken: window.localStorage.getItem("adminToken"),
-            email,
-            password: pass1,
-          });
+          let res = await axios.post(
+            API_URL + "/admin/addaccount",
+            {
+              email,
+              password: pass1,
+            },
+            { headers: { authorization: ADMIN_TOKEN } }
+          );
           alert(res.data.message);
         } catch (error) {
           setLoading(false);
@@ -154,7 +166,8 @@ export default function Account() {
           onSubmit={(e) => {
             e.preventDefault();
             createAdmin();
-          }}>
+          }}
+        >
           <div className="mx-auto form-group">
             <h3 className="mx-auto text-info"> Add new admin</h3>
             <br />
@@ -227,7 +240,8 @@ export default function Account() {
                     onSubmit={(e) => {
                       e.preventDefault();
                       updateUsername();
-                    }}>
+                    }}
+                  >
                     <div className="form-group">
                       <label>Username</label>
                       <input
@@ -245,7 +259,8 @@ export default function Account() {
                     </div>
                     <button
                       type="submit"
-                      className="btn btn-warning d-flex mx-auto px-5">
+                      className="btn btn-warning d-flex mx-auto px-5"
+                    >
                       Update Username
                     </button>
                   </form>
@@ -263,7 +278,8 @@ export default function Account() {
                     onSubmit={(e) => {
                       e.preventDefault();
                       updatePassword();
-                    }}>
+                    }}
+                  >
                     <div className="form-group">
                       <label>Current Password</label>
                       <input
@@ -308,7 +324,8 @@ export default function Account() {
                     </div>
                     <button
                       type="submit"
-                      className="btn btn-warning d-flex mx-auto px-5">
+                      className="btn btn-warning d-flex mx-auto px-5"
+                    >
                       Update Password
                     </button>
                   </form>

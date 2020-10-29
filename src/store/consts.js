@@ -1,4 +1,6 @@
-const API_URL = "https://cmshare.herokuapp.com/api/v1"; // http://localhost:4545  // https://cmshare.herokuapp.com
+const API_URL = "https://cmshare.herokuapp.com"; // http://localhost:4545  // https://cmshare.herokuapp.com
+
+const ADMIN_TOKEN = window.localStorage.getItem("adminToken");
 
 const DRIVE_FOLDER_NAME = "CM Sharer";
 
@@ -17,4 +19,5 @@ export {
   DISCOVERY_DOCS,
   SCOPES,
   DRIVE_FOLDER_NAME,
+  ADMIN_TOKEN,
 };

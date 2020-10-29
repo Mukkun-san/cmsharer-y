@@ -37,7 +37,8 @@ export default function Login() {
               onSubmit={(e) => {
                 e.preventDefault();
                 Login();
-              }}>
+              }}
+            >
               <div className="form-group">
                 <label>Email</label>
                 <input

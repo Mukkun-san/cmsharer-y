@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { API_URL } from "../../../store/consts.js";
+import { API_URL, ADMIN_TOKEN } from "../../../store/consts.js";
 import Loader from "../../../components/Loader";
 import { toastError, toastSuccess } from "../../../Helpers/toasts";
 
@@ -9,7 +9,9 @@ export default function Users() {
 
   useEffect(() => {
     axios
-      .get(API_URL + "/users/getAll")
+      .get(API_URL + "/users/getAll", {
+        headers: { authorization: ADMIN_TOKEN },
+      })
       .then((res) => {
         setUsers(res.data.users);
       })
@@ -18,7 +20,9 @@ export default function Users() {
 
   function removeUser(_id) {
     axios
-      .delete(API_URL + "/users/" + _id)
+      .delete(API_URL + "/users/" + _id, {
+        headers: { authorization: ADMIN_TOKEN },
+      })
       .then((result) => {
         setUsers(users.filter((user) => user._id !== _id));
         toastSuccess("User was successfully removed");
@@ -76,7 +80,8 @@ export default function Users() {
                           value={user._id}
                           type="button"
                           className="btn btn-sm ml-2 btn-danger"
-                          onClick={(e) => removeUser(e.target.value)}>
+                          onClick={(e) => removeUser(e.target.value)}
+                        >
                           Delete
                         </button>
                       </td>

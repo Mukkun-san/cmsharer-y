@@ -1,44 +1,125 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { API_URL } from "../../../store/consts";
+import { API_URL, ADMIN_TOKEN } from "../../../store/consts";
 import Toggle from "react-toggle";
 import "react-toggle/style.css";
 
 export default function AddLinks() {
   function GoogleDrive() {
-    const [link, setLink] = useState("");
-    const [links, setLinks] = useState([]);
-    const [fileIds, setFileIds] = useState([]);
     const [validation, setValidation] = useState({});
+    const [link, setLink] = useState("");
+    const [message, setMessage] = useState(null);
     const [loading, setLoading] = useState(false);
+    const [bulkLoading, setBulkLoading] = useState(false);
 
-    const [inBulk, setInBulk] = useState(true);
+    const [inBulk, setInBulk] = useState(false);
+    const [byID, setByID] = useState(true);
     const [bulkLinks, setBulkLinks] = useState("");
 
-    function generate() {
+    async function generateOne(e) {
+      e.preventDefault();
       setLoading(true);
+      const linkRegExp = new RegExp("^https://drive.google.com/file/d/", "i");
+      if (!byID && !link.match(linkRegExp)) {
+        setMessage("'" + link + "' is not a valid drive file link!");
+      } else {
+        let fileId;
+        if (byID) {
+          fileId = link.trim();
+        } else {
+          let part1 = link.replace(linkRegExp, "");
+          fileId = part1.substring(0, part1.indexOf("/"));
+        }
+        setMessage("Checking Drive File...");
+        try {
+          let getfile = await axios.post(
+            API_URL + "/drive/verifFile",
+            {
+              fileId,
+            },
+            { headers: { authorization: ADMIN_TOKEN } }
+          );
+          if (getfile.data.fileExists) {
+            setMessage("Generating File Link");
+            let addfile = await axios.post(
+              API_URL + "/links/add/drive",
+              {
+                ...getfile.data,
+              },
+              { headers: { authorization: ADMIN_TOKEN } }
+            );
+            if (addfile.data.message) {
+              setMessage(
+                <p>
+                  {addfile.data.message} <br /> <b>Link:</b>
+                  <a
+                    target="_blank"
+                    href={window.location.origin + "/drive/" + fileId}
+                  >
+                    {window.location.origin + "/drive/" + fileId}
+                  </a>
+                </p>
+              );
+              setLink("");
+            } else {
+              if (addfile.data === "OK") {
+                setMessage(
+                  <p>
+                    Successfully generated!
+                    <br /> <b>Link:</b>
+                    <a
+                      target="_blank"
+                      href={window.location.origin + "/drive/" + fileId}
+                    >
+                      {window.location.origin + "/drive/" + fileId}
+                    </a>
+                  </p>
+                );
+                setLink("");
+              } else {
+                setMessage("Error Generating Link, please try again later.");
+              }
+            }
+          } else {
+            setMessage("The file link in not working");
+          }
+        } catch (error) {
+          setMessage("The file link in not working");
+        }
+      }
+      setLoading(false);
     }
 
     function generateBulk() {
-      bulkLinks.split("\n").forEach(async (link) => {
+      bulkLinks.split("\n").forEach(async (line, i) => {
         const linkRegExp = new RegExp("^https://drive.google.com/file/d/", "i");
-        if (!link) {
+        if (!line) {
           console.log("Enter a drive file link to generate");
-        } else if (!link.match(linkRegExp)) {
-          console.log("'" + link + "' is not a valid drive file link!");
+        } else if (!byID && !line.match(linkRegExp)) {
+          console.log("'" + line + "' is not a valid drive file link!");
         } else {
-          let part1 = link.replace(linkRegExp, "");
-          const fileId = part1.substring(0, part1.indexOf("/"));
-          console.log("Checking Drive File Link...");
+          let fileId = line.trim();
+          if (!byID) {
+            let part1 = line.replace(linkRegExp, "");
+            fileId = part1.substring(0, part1.indexOf("/"));
+          }
           try {
-            let getfile = await axios.post(API_URL + "/drive/verifFile", {
-              fileId,
-            });
+            let getfile = await axios.post(
+              API_URL + "/drive/verifFile",
+              {
+                fileId,
+              },
+              { headers: { authorization: ADMIN_TOKEN } }
+            );
             if (getfile.data.fileExists) {
               console.log("Generating File Link");
-              let addfile = await axios.post(API_URL + "/drive/addFile", {
-                ...getfile.data,
-              });
+              let addfile = await axios.post(
+                API_URL + "/links/add/drive",
+                {
+                  ...getfile.data,
+                },
+                { headers: { authorization: ADMIN_TOKEN } }
+              );
               if (addfile.data.message) {
                 setTimeout(() => {
                   console.log(addfile.data.message);
@@ -64,38 +145,10 @@ export default function AddLinks() {
       });
     }
 
-    async function addLink() {
-      setValidation({});
-      const linkRegExp = new RegExp("^https://drive.google.com/file/d/", "i");
-      if (!link) {
-        setValidation({
-          text: "Field is empty!",
-          class: "text-danger",
-          state: "is-invalid",
-        });
-      } else if (!link.match(linkRegExp)) {
-        setValidation({
-          text: "Not a valid Google Drive link!",
-          class: "text-danger",
-          state: "is-invalid",
-        });
-      } else {
-        let part1 = link.replace(linkRegExp, "");
-        const fileId = part1.substring(0, part1.indexOf("/"));
-        if (fileIds.includes(fileId.toLowerCase())) {
-          setValidation({
-            text: "Link Already Added!",
-            class: "text-danger",
-            state: "is-invalid",
-          });
-        } else {
-          setLinks([...links, link]);
-          setFileIds([...fileIds, fileId.toLowerCase()]);
-        }
-      }
-      setTimeout(() => {
-        setValidation({});
-      }, 2000);
+    function reset() {
+      setMessage("");
+      setLoading(false);
+      setBulkLoading(false);
     }
 
     return (
@@ -111,27 +164,78 @@ export default function AddLinks() {
               />
               <h4
                 style={{ position: "absolute", bottom: 0 }}
-                className="text-success font-weight-normal d-inline ml-3">
+                className="text-success font-weight-normal d-inline ml-3"
+              >
                 Add Google Drive Links
               </h4>
               <label className="float-right d-flex align-content-center mr-3">
+                <span className="mr-2">
+                  <b
+                    className={
+                      inBulk
+                        ? "text-secondary font-weight-normal"
+                        : "text-success"
+                    }
+                  >
+                    Single
+                  </b>{" "}
+                </span>
                 <Toggle
                   icons={false}
                   checked={inBulk}
                   onChange={(e) => {
                     setInBulk(Boolean(e.target.checked));
+                    reset();
                   }}
                 />
                 <span className="ml-2">
-                  {" "}
-                  <b>Bulk</b>{" "}
+                  <b
+                    className={
+                      inBulk
+                        ? "text-success"
+                        : "text-secondary font-weight-normal"
+                    }
+                  >
+                    Bulk
+                  </b>{" "}
+                </span>
+              </label>
+              <label className="float-right d-flex align-content-center mr-5">
+                <span className="mr-2">
+                  <b
+                    className={
+                      byID
+                        ? "text-secondary font-weight-normal"
+                        : "text-success"
+                    }
+                  >
+                    By Link
+                  </b>{" "}
+                </span>
+                <Toggle
+                  icons={false}
+                  checked={byID}
+                  onChange={(e) => {
+                    setByID(Boolean(e.target.checked));
+                  }}
+                />
+                <span className="ml-2">
+                  <b
+                    className={
+                      byID
+                        ? "text-success"
+                        : "text-secondary font-weight-normal"
+                    }
+                  >
+                    By ID
+                  </b>{" "}
                 </span>
               </label>
             </div>
             {inBulk ? (
               <div className="mb-4">
                 <p className="text-center text-secondary font-italic">
-                  Add links each one in a separate line.
+                  1 link /ID per line.
                 </p>
                 <div className="form-group d-flex justify-content-center">
                   <textarea
@@ -141,24 +245,26 @@ export default function AddLinks() {
                     }}
                     className="form-control w-75"
                     id="exampleFormControlTextarea1"
-                    rows="3"></textarea>
+                    rows="3"
+                  ></textarea>
                 </div>
                 <div className="row">
                   <button
                     disabled={bulkLinks ? false : true}
                     className="btn btn-success mx-auto"
-                    onClick={generateBulk}>
+                    onClick={generateBulk}
+                  >
                     Generate All
                   </button>
                 </div>
               </div>
             ) : (
               <div className="form-group my-4">
-                <form onSubmit={(e) => e.preventDefault()}>
+                <form onSubmit={generateOne}>
                   <div className="row ml-3">
                     <div className="col-9">
                       <input
-                        placeholder="Paste a link here then click ADD"
+                        placeholder="Paste Drive Link or ID"
                         type="text"
                         className={`form-control ${validation.state}`}
                         value={link}
@@ -166,20 +272,20 @@ export default function AddLinks() {
                       />
                     </div>
                     <div className="col-3">
-                      {loading}
                       <button
                         type="submit"
                         className={
                           loading ? "btn btn-light" : "btn btn-warning"
                         }
-                        onClick={addLink}
-                        disabled={loading || !link ? true : false}>
+                        disabled={loading || !link ? true : false}
+                      >
                         {!loading ? (
-                          "Add"
+                          "Generate"
                         ) : (
                           <div
                             className="spinner-border text-warning"
-                            role="status">
+                            role="status"
+                          >
                             <span className="sr-only">Loading...</span>
                           </div>
                         )}
@@ -190,23 +296,8 @@ export default function AddLinks() {
                     </p>
                   </div>
                 </form>
-                <div className="m-3 bg-light border-3 border-primary font-smaller">
-                  {links && links.length ? (
-                    <div>
-                      {" "}
-                      {links.map((link, i) => {
-                        return (
-                          <ul key={"dlink-" + i}>
-                            <li>{link}</li>
-                          </ul>
-                        );
-                      })}
-                      <hr />
-                      <button type="button" className="btn btn-success">
-                        Generate All
-                      </button>
-                    </div>
-                  ) : null}
+                <div className="p-3 bg-light text-center font-smaller">
+                  {message ? <div>{message}</div> : null}
                 </div>
               </div>
             )}
@@ -218,7 +309,84 @@ export default function AddLinks() {
 
   function YandexDisk() {
     const [link, setLink] = useState("");
-    const [links, setLinks] = useState([]);
+
+    const [bulking, setBulking] = useState();
+
+    const [validation, setValidation] = useState({});
+    const [message, setMessage] = useState(null);
+    const [loading, setLoading] = useState(false);
+    const [bulkLoading, setBulkLoading] = useState(false);
+
+    const [inBulk, setInBulk] = useState(false);
+    const [bulkLinks, setBulkLinks] = useState("");
+
+    function generateOne(e) {
+      e.preventDefault();
+      setMessage("Loading...");
+      axios
+        .post(
+          API_URL + "/links/add/yandex",
+          { public_key: link.trim() },
+          { headers: { authorization: ADMIN_TOKEN } }
+        )
+        .then((result) => {
+          console.log(result);
+          if (result.data.slug) {
+            setMessage(
+              <p>
+                "File available at: " +
+                <a
+                  href={window.location.origin + "/y/" + result.data.slug}
+                  target="_blank"
+                >
+                  {window.location.origin + "/y/" + result.data.slug}
+                </a>
+              </p>
+            );
+          } else {
+            setMessage(result.data.message);
+          }
+        })
+        .catch((err) => {
+          setMessage("Error occured");
+          console.log(err);
+        });
+    }
+
+    function generateBulk() {
+      setMessage("Please Wait.. ( check console xD )");
+      bulkLinks.split("\n").forEach((link) => {
+        axios
+          .post(
+            API_URL + "/links/add/yandex",
+            { public_key: link.trim() },
+            { headers: { authorization: ADMIN_TOKEN } }
+          )
+          .then((result) => {
+            console.log(result);
+            if (result.data.slug) {
+              setMessage(
+                "File available at: " +
+                  window.location.origin +
+                  "/y/" +
+                  result.data.slug
+              );
+            } else {
+              setMessage(result.data.message);
+            }
+          })
+          .catch((err) => {
+            setMessage("Error occured");
+            console.log(err);
+          });
+      });
+    }
+
+    function reset() {
+      setMessage("");
+      setLoading(false);
+      setBulkLoading(false);
+    }
 
     return (
       <div className="container">
@@ -233,43 +401,113 @@ export default function AddLinks() {
               />
               <h4
                 style={{ position: "absolute", bottom: 0 }}
-                className="text-primary font-weight-normal d-inline ml-3">
+                className="text-primary font-weight-normal d-inline ml-3"
+              >
                 Add Yandex.Disk Links
               </h4>
+              <label className="float-right d-flex align-content-center">
+                <span className="mr-2">
+                  <b
+                    className={
+                      inBulk
+                        ? "text-secondary font-weight-normal"
+                        : "text-success"
+                    }
+                  >
+                    Single
+                  </b>{" "}
+                </span>
+                <Toggle
+                  icons={false}
+                  checked={inBulk}
+                  onChange={(e) => {
+                    setInBulk(Boolean(e.target.checked));
+                    reset();
+                  }}
+                />
+                <span className="ml-2">
+                  <b
+                    className={
+                      inBulk
+                        ? "text-success"
+                        : "text-secondary font-weight-normal"
+                    }
+                  >
+                    Bulk
+                  </b>{" "}
+                </span>
+              </label>
             </div>
 
-            <div className="form-group">
-              <form onSubmit={(e) => e.preventDefault()}>
-                <div className="row ml-3">
-                  <div className="col-9">
-                    <input
-                      placeholder="Paste a link here then click ADD"
-                      type="text"
-                      className="form-control"
-                      value={link}
-                      onChange={(e) => setLink(e.target.value)}
-                    />
-                  </div>
-                  <div className="col-3">
-                    <button
-                      type="submit"
-                      className="btn btn-warning"
-                      onClick={() => setLinks([...links, link])}>
-                      Add
-                    </button>
-                  </div>
+            {inBulk ? (
+              <div className="mb-4">
+                <p className="text-center text-secondary font-italic">
+                  1 link per line.
+                </p>
+                <div className="form-group d-flex justify-content-center">
+                  <textarea
+                    value={bulkLinks}
+                    onChange={(e) => {
+                      setBulkLinks(e.target.value);
+                    }}
+                    className="form-control w-75"
+                    id="exampleFormControlTextarea1"
+                    rows="3"
+                  ></textarea>
                 </div>
-              </form>
-              {/* <div className="m-3 bg-light border-3 border-primary">
-                {links.map((link, i) => {
-                  return (
-                    <p key={"dlink-" + i}>
-                      {link} <br />
+                <div className="row">
+                  <button
+                    disabled={bulkLinks ? false : true}
+                    className="btn btn-success mx-auto"
+                    onClick={generateBulk}
+                  >
+                    Generate All
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div className="form-group my-4">
+                <form onSubmit={generateOne}>
+                  <div className="row ml-3">
+                    <div className="col-9">
+                      <input
+                        placeholder="Paste Yandex.Disk public link"
+                        type="text"
+                        className={`form-control ${validation.state}`}
+                        value={link}
+                        onChange={(e) => setLink(e.target.value)}
+                      />
+                    </div>
+                    <div className="col-3">
+                      <button
+                        type="submit"
+                        className={
+                          loading ? "btn btn-light" : "btn btn-warning"
+                        }
+                        disabled={loading || !link ? true : false}
+                      >
+                        {!loading ? (
+                          "Generate"
+                        ) : (
+                          <div
+                            className="spinner-border text-warning"
+                            role="status"
+                          >
+                            <span className="sr-only">Loading...</span>
+                          </div>
+                        )}
+                      </button>
+                    </div>
+                    <p className={"col-12 mt-3 " + validation.class}>
+                      {validation.text}
                     </p>
-                  );
-                })}
-              </div> */}
-            </div>
+                  </div>
+                </form>
+                <div className="p-3 bg-light text-center font-smaller">
+                  {message ? <div>{message}</div> : null}
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -283,9 +521,11 @@ export default function AddLinks() {
           <h1 className="text-center">Generate Links</h1>
         </div>
         <div className="card-body">
-          <div className="card col">
+          <div className="card col h-50">
             <GoogleDrive />
           </div>
+          <br />
+          <br />
           <div className="card col">
             <YandexDisk />
           </div>

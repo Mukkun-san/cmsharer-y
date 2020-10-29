@@ -7,7 +7,7 @@ import {
   toastSuccess,
 } from "../../../Helpers/toasts";
 import axios from "axios";
-import { API_URL } from "../../../store/consts.js";
+import { API_URL, ADMIN_TOKEN } from "../../../store/consts.js";
 import Loader from "../../../components/Loader";
 import scss from "./styles.module.scss";
 
@@ -21,9 +21,11 @@ export default function Dashboard() {
 
   useEffect(() => {
     axios
-      .post(API_URL + "/stats/getall", {
-        accessToken: window.localStorage.getItem("adminToken"),
-      })
+      .post(
+        API_URL + "/stats/getall",
+        {},
+        { headers: { authorization: ADMIN_TOKEN } }
+      )
       .then((result) => {
         setStats(result.data);
         setLoading(false);
@@ -47,14 +49,22 @@ export default function Dashboard() {
       setloadingLinkGen(true);
       setLoadingMsg("Checking Drive File Link...");
       try {
-        let getfile = await axios.post(API_URL + "/drive/verifFile", {
-          fileId,
-        });
+        let getfile = await axios.post(
+          API_URL + "/drive/verifFile",
+          {
+            fileId,
+          },
+          { headers: { authorization: ADMIN_TOKEN } }
+        );
         if (getfile.data.fileExists) {
           setLoadingMsg("Generating File Link");
-          let addfile = await axios.post(API_URL + "/drive/addFile", {
-            ...getfile.data,
-          });
+          let addfile = await axios.post(
+            API_URL + "/links/add/drive",
+            {
+              ...getfile.data,
+            },
+            { headers: { authorization: ADMIN_TOKEN } }
+          );
           if (addfile.data.message) {
             setTimeout(() => {
               toastWarning(addfile.data.message);
@@ -110,7 +120,8 @@ export default function Dashboard() {
                   <div className="col-12 col-sm-4 mb-3 ml-auto mr-auto">
                     <Link
                       to="/admin/dashboard/users"
-                      style={{ textDecoration: "none" }}>
+                      style={{ textDecoration: "none" }}
+                    >
                       <DashboardCard
                         icon="user--v1.png"
                         title="Users"
@@ -121,7 +132,8 @@ export default function Dashboard() {
                   <div className="col-12 col-sm-4 mb-3 ml-auto mr-auto">
                     <Link
                       to="/admin/dashboard/links"
-                      style={{ textDecoration: "none" }}>
+                      style={{ textDecoration: "none" }}
+                    >
                       <DashboardCard
                         title="Links"
                         icon="folder-invoices.png"
@@ -149,7 +161,8 @@ export default function Dashboard() {
                         <div className="input-group-prepend">
                           <span
                             className="input-group-text"
-                            id="inputGroup-sizing-lg">
+                            id="inputGroup-sizing-lg"
+                          >
                             <img
                               src="https://img.icons8.com/material-outlined/24/000000/download-from-cloud.png"
                               alt=""
@@ -175,7 +188,8 @@ export default function Dashboard() {
                           generateLink();
                         }}
                         type="button"
-                        className="btn btn-outline-info btn-block btn-lg">
+                        className="btn btn-outline-info btn-block btn-lg"
+                      >
                         Generate Link
                       </button>
                     </div>

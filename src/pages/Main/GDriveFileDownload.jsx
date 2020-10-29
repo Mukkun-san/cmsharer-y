@@ -6,7 +6,7 @@ import NotFound from "../NotFound/NotFound";
 import Loader from "../../components/Loader";
 import prettyBytes from "pretty-bytes";
 
-export default function FileDownload({ user, handleAuthClick }) {
+export default function GDriveFileDownload({ user, handleAuthClick }) {
   let { fileId } = useParams();
   const [file, setFile] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -22,6 +22,7 @@ export default function FileDownload({ user, handleAuthClick }) {
         let result = await axios.post(API_URL + "/links/getFile", { fileId });
         if (result.data.fileExists) {
           setFile(result.data.file);
+          console.log(result.data.file);
         } else {
           setFile(false);
         }
@@ -39,7 +40,8 @@ export default function FileDownload({ user, handleAuthClick }) {
           <button
             disabled
             className="btn btn-info d-flex"
-            onClick={() => download()}>
+            onClick={() => download()}
+          >
             <div className="spinner-border" role="status">
               <span className="sr-only">Loading...</span>
             </div>
@@ -146,7 +148,8 @@ export default function FileDownload({ user, handleAuthClick }) {
             className="d-flex justify-content-center d-inline"
             onClick={() => {
               handleAuthClick();
-            }}>
+            }}
+          >
             <div className="w-auto pr-5 pl-5 d-flex btn btn-light">
               <img
                 style={{ height: "2.5rem" }}
@@ -208,7 +211,8 @@ export default function FileDownload({ user, handleAuthClick }) {
                   target="_blank"
                   href=""
                   id="DDL"
-                  style={{ visibility: "hidden", height: 0 }}>
+                  style={{ visibility: "hidden", height: 0 }}
+                >
                   download link placeholder
                 </a>
               </div>

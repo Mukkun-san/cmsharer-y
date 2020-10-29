@@ -5,7 +5,8 @@ import {
   Route,
   Redirect,
 } from "react-router-dom";
-import FileDownload from "./pages/Main/FileDownload";
+import GDriveFileDownload from "./pages/Main/GDriveFileDownload";
+import YandexFileDownload from "./pages/Main/YandexFileDownload";
 import Home from "./pages/Main/Home";
 import Account from "./pages/Main/Account";
 import Contact from "./pages/Main/Contact";
@@ -23,7 +24,7 @@ import Loader from "./components/Loader";
 import NavBar from "./components/NavBar";
 import AdminNavBar from "./components/AdminNavBar";
 import axios from "axios";
-import { API_URL } from "./store/consts.js";
+import { API_URL, ADMIN_TOKEN } from "./store/consts.js";
 import { CLIENT_ID, API_KEY, DISCOVERY_DOCS, SCOPES } from "./store/consts";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -60,7 +61,9 @@ export default function App() {
           email: user.getBasicProfile().getEmail(),
           picture: user.getBasicProfile().getImageUrl(),
         };
-        await axios.post(API_URL + "/users/addOne", userdata);
+        await axios.post(API_URL + "/users/addOne", userdata, {
+          headers: { authorization: ADMIN_TOKEN },
+        });
         window.location.reload();
       })
       .catch((err) => {
@@ -82,10 +85,11 @@ export default function App() {
   });
 
   async function adminAuth() {
-    const accessToken = window.localStorage.getItem("adminToken") || null;
-    let res = await axios.post(API_URL + "/admin/authorize", {
-      accessToken,
-    });
+    let res = await axios.post(
+      API_URL + "/admin/authorize",
+      {},
+      { headers: { authorization: ADMIN_TOKEN } }
+    );
     if (res.data && res.data.authorized) {
       setAdminIsLoggedin(true);
     } else {
@@ -104,7 +108,8 @@ export default function App() {
         <div
           style={{
             backgroundImage: 'url("./assets/1526027.jpg")',
-          }}>
+          }}
+        >
           {/* A <Switch> looks through its children <Route>s and
             renders the first one that matches the current URL. */}
           <Switch>
@@ -161,7 +166,14 @@ export default function App() {
             </Route>
             <Route exact path="/drive/:fileId">
               <NavBar currentUser={user} />
-              <FileDownload user={user} handleAuthClick={handleAuthClick} />
+              <GDriveFileDownload
+                user={user}
+                handleAuthClick={handleAuthClick}
+              />
+            </Route>
+            <Route exact path="/y/:slug">
+              <NavBar currentUser={user} />
+              <YandexFileDownload />
             </Route>
             <Route exact path="/privacy-policy">
               <NavBar currentUser={user} />
