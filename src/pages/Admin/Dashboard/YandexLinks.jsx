@@ -17,9 +17,8 @@ import TableRow from "@material-ui/core/TableRow";
 import Paper from "@material-ui/core/Paper";
 import Icon from "@material-ui/core/Icon";
 
-export default function Links() {
+export default function YandexLinks() {
   const [links, setLinks] = useState(null);
-  const [searchQuery, setUserQuery] = useState("");
 
   useEffect(() => {
     fetchAllLinks();
@@ -27,7 +26,9 @@ export default function Links() {
 
   function fetchAllLinks() {
     axios
-      .get(API_URL + "/links/all", { headers: { authorization: ADMIN_TOKEN } })
+      .get(API_URL + "/links/yandex", {
+        headers: { authorization: ADMIN_TOKEN },
+      })
       .then((res) => {
         setLinks(res.data);
       })
@@ -36,32 +37,11 @@ export default function Links() {
       });
   }
 
-  const sendQuery = (query) => {
-    axios
-      .get(API_URL + "/links/search/" + query, {
-        headers: { authorization: ADMIN_TOKEN },
-      })
-      .then((result) => {
-        setLinks(result.data);
-      })
-      .catch((err) => {});
-  };
-  const delayedQuery = useCallback(
-    _debounce((q) => sendQuery(q), 10),
-    []
-  );
-  const search = () => {
-    if (searchQuery) {
-      delayedQuery(searchQuery);
-    } else {
-      fetchAllLinks();
-    }
-  };
   const UsersTable = () => {
     const [overlay, setOverlay] = useState(false);
     const [activeAction, setActiveAction] = useState("");
 
-    const ActionDropdown = ({ fileId, _id }) => {
+    const ActionDropdown = ({ slug, _id }) => {
       const [show, setShow] = useState(false);
       const [deleting, setDeleting] = useState(false);
 
@@ -114,7 +94,7 @@ export default function Links() {
               <p className="btn p-0 m-0">
                 <a
                   className="text-black d-flex align-content-center"
-                  href={window.location.origin + "/drive/" + fileId}
+                  href={window.location.origin + "/y/" + slug}
                   target="_blank"
                 >
                   <Icon className="mr-2">launch</Icon>
@@ -147,7 +127,7 @@ export default function Links() {
               <TableRow>
                 <TableCell>#</TableCell>
                 <TableCell align="left">File Name</TableCell>
-                <TableCell align="left">Drive ID</TableCell>
+                <TableCell align="left">Yandex Link</TableCell>
                 <TableCell align="left">Size</TableCell>
                 <TableCell align="left">Quality</TableCell>
                 <TableCell align="left">Downloads</TableCell>
@@ -162,7 +142,15 @@ export default function Links() {
                     {i + 1}
                   </TableCell>
                   <TableCell align="left">{row.fileName}</TableCell>
-                  <TableCell align="left">{row.fileId}</TableCell>
+                  <TableCell align="left">
+                    <a
+                      href={row.public_key}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      {row.public_key}
+                    </a>
+                  </TableCell>
                   <TableCell align="left">-</TableCell>
                   <TableCell align="left">-</TableCell>
                   <TableCell align="left">{row.downloads}</TableCell>
@@ -178,7 +166,7 @@ export default function Links() {
                     </pre>
                   </TableCell>
                   <TableCell>
-                    <ActionDropdown _id={row._id} fileId={row.fileId} />
+                    <ActionDropdown _id={row._id} slug={row.slug} />
                   </TableCell>
                 </TableRow>
               ))}
@@ -206,6 +194,32 @@ export default function Links() {
   };
 
   const SearchBar = () => {
+    const [searchQuery, setUserQuery] = useState("");
+    const sendQuery = (query) => {
+      axios
+        .post(
+          API_URL + "/links/search",
+          { type: "yandex", q: query },
+          {
+            headers: { authorization: ADMIN_TOKEN },
+          }
+        )
+        .then((result) => {
+          setLinks(result.data);
+        })
+        .catch((err) => {});
+    };
+    const delayedQuery = useCallback(
+      _debounce((q) => sendQuery(q), 10),
+      []
+    );
+    const search = () => {
+      if (searchQuery) {
+        delayedQuery(searchQuery);
+      } else {
+        fetchAllLinks();
+      }
+    };
     return (
       <form
         onSubmit={(e) => {
@@ -245,7 +259,7 @@ export default function Links() {
       <SearchBar />
       <br />
       {links && links.length ? (
-        <div className="mx-5 px-5">
+        <div className="mx-2">
           <UsersTable />
         </div>
       ) : links === null ? (

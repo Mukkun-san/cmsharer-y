@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
 import { DashboardCard, LinkLoader } from "./.jsx";
 import {
   toastError,
@@ -38,61 +37,84 @@ export default function Dashboard() {
   async function generateLink() {
     setGeneratedLink(false);
     setLoadingMsg(false);
-    const linkRegExp = new RegExp("^https://drive.google.com/file/d/", "i");
+    const driveLinkRegExp = new RegExp(
+      "^https://drive.google.com/file/d/",
+      "i"
+    );
+    const yandexLinkRegExp = new RegExp("https://yadi.sk/", "i");
     if (!link) {
       toastError("Enter a drive file link to generate");
-    } else if (!link.match(linkRegExp)) {
-      toastError("'" + link + "' is not a valid drive file link!");
-    } else {
-      let part1 = link.replace(linkRegExp, "");
+    } else if (link.match(driveLinkRegExp)) {
+      let part1 = link.replace(driveLinkRegExp, "");
       const fileId = part1.substring(0, part1.indexOf("/"));
       setloadingLinkGen(true);
       setLoadingMsg("Checking Drive File Link...");
-      try {
-        let getfile = await axios.post(
-          API_URL + "/drive/verifFile",
-          {
-            fileId,
-          },
-          { headers: { authorization: ADMIN_TOKEN } }
-        );
-        if (getfile.data.fileExists) {
+      window.gapi.client.drive.files
+        .get({ fileId, fields: "*" })
+        .then(async (getfile) => {
           setLoadingMsg("Generating File Link");
-          let addfile = await axios.post(
-            API_URL + "/links/add/drive",
-            {
-              ...getfile.data,
-            },
-            { headers: { authorization: ADMIN_TOKEN } }
-          );
-          if (addfile.data.message) {
-            setTimeout(() => {
-              toastWarning(addfile.data.message);
-              setGeneratedLink(window.location.origin + "/drive/" + fileId);
-            }, 250);
-          } else {
-            addfile.data === "OK"
-              ? setTimeout(() => {
-                  toastSuccess("Link Successfully Generated.");
-                  setGeneratedLink(window.location.origin + "/drive/" + fileId);
-                }, 250)
-              : setTimeout(() => {
-                  toastError("Error Generating Link, please try again later.");
-                }, 250);
-          }
+          try {
+            let addfile = await axios.post(
+              API_URL + "/links/add/drive",
+              getfile.result,
+              { headers: { authorization: ADMIN_TOKEN } }
+            );
+            if (addfile.data.message) {
+              setTimeout(() => {
+                toastWarning(addfile.data.message);
+                setGeneratedLink(window.location.origin + "/drive/" + fileId);
+              }, 250);
+            } else {
+              addfile.data === "OK"
+                ? setTimeout(() => {
+                    toastSuccess("Link Successfully Generated.");
+                    setGeneratedLink(
+                      window.location.origin + "/drive/" + fileId
+                    );
+                  }, 250)
+                : setTimeout(() => {
+                    toastError(
+                      "Error Generating Link, please try again later."
+                    );
+                  }, 250);
+            }
+          } catch (error) {}
+
           setTimeout(() => {
             setLoadingMsg(false);
             setloadingLinkGen(false);
           }, 250);
-        } else {
+        })
+        .catch((err) => {
           setLoadingMsg(false);
           setloadingLinkGen(false);
-          toastError("The file link in not working");
-        }
-      } catch (error) {
-        setloadingLinkGen(false);
-        toastError("The file link in not working");
-      }
+          toastError("The file is not found");
+        });
+    } else if (link.match(yandexLinkRegExp)) {
+      setloadingLinkGen(true);
+      setLoadingMsg("Generating File Link");
+      axios
+        .post(
+          API_URL + "/links/add/yandex",
+          { public_key: link.trim() },
+          { headers: { authorization: ADMIN_TOKEN } }
+        )
+        .then((result) => {
+          console.log(result);
+          if (result.data.slug) {
+            setGeneratedLink(window.location.origin + "/y/" + result.data.slug);
+          } else {
+            toastWarning(result.data.message);
+          }
+          setloadingLinkGen(false);
+        })
+        .catch((err) => {
+          toastError("Error occured");
+          setloadingLinkGen(false);
+          console.log(err);
+        });
+    } else {
+      toastError("Not a valid drive or yandex link");
     }
   }
   return (
@@ -118,28 +140,18 @@ export default function Dashboard() {
               <div className="col-11">
                 <div className="row">
                   <div className="col-12 col-sm-4 mb-3 ml-auto mr-auto">
-                    <Link
-                      to="/admin/dashboard/users"
-                      style={{ textDecoration: "none" }}
-                    >
-                      <DashboardCard
-                        icon="user--v1.png"
-                        title="Users"
-                        count={stats.users}
-                      />
-                    </Link>
+                    <DashboardCard
+                      icon="user--v1.png"
+                      title="Users"
+                      count={stats.users}
+                    />
                   </div>
                   <div className="col-12 col-sm-4 mb-3 ml-auto mr-auto">
-                    <Link
-                      to="/admin/dashboard/links"
-                      style={{ textDecoration: "none" }}
-                    >
-                      <DashboardCard
-                        title="Links"
-                        icon="folder-invoices.png"
-                        count={stats.links}
-                      />
-                    </Link>
+                    <DashboardCard
+                      title="Links"
+                      icon="folder-invoices.png"
+                      count={stats.links}
+                    />
                   </div>
                   <div className="col-12 col-sm-4 mb-3 ml-auto mr-auto">
                     <DashboardCard

@@ -13,14 +13,12 @@ export default function YandexFileDownload() {
   const [downloading, setDownloading] = useState(false);
 
   useEffect(() => {
-    console.log(slug);
     getFile();
     async function getFile() {
       try {
         let result = await axios.get(API_URL + "/links/yandex/" + slug, {
           headers: { authorization: ADMIN_TOKEN },
         });
-        console.log(result.data);
         setFile(result.data);
         setLoading(false);
       } catch (error) {
@@ -53,7 +51,9 @@ export default function YandexFileDownload() {
                       </a>
                     </button>
                   </div>
-                ) : null}
+                ) : (
+                  <NotFound />
+                )}
               </div>
             </div>
           </div>

@@ -31,20 +31,14 @@ export default function AddLinks() {
           fileId = part1.substring(0, part1.indexOf("/"));
         }
         setMessage("Checking Drive File...");
-        try {
-          let getfile = await axios.post(
-            API_URL + "/drive/verifFile",
-            {
-              fileId,
-            },
-            { headers: { authorization: ADMIN_TOKEN } }
-          );
-          if (getfile.data.fileExists) {
+        window.gapi.client.drive.files
+          .get({ fileId, fields: "id, name" })
+          .then(async (getfile) => {
             setMessage("Generating File Link");
             let addfile = await axios.post(
               API_URL + "/links/add/drive",
               {
-                ...getfile.data,
+                ...getfile.result,
               },
               { headers: { authorization: ADMIN_TOKEN } }
             );
@@ -80,12 +74,10 @@ export default function AddLinks() {
                 setMessage("Error Generating Link, please try again later.");
               }
             }
-          } else {
+          })
+          .catch((error) => {
             setMessage("The file link in not working");
-          }
-        } catch (error) {
-          setMessage("The file link in not working");
-        }
+          });
       }
       setLoading(false);
     }
@@ -103,44 +95,53 @@ export default function AddLinks() {
             let part1 = line.replace(linkRegExp, "");
             fileId = part1.substring(0, part1.indexOf("/"));
           }
-          try {
-            let getfile = await axios.post(
-              API_URL + "/drive/verifFile",
-              {
-                fileId,
-              },
-              { headers: { authorization: ADMIN_TOKEN } }
-            );
-            if (getfile.data.fileExists) {
-              console.log("Generating File Link");
+          window.gapi.client.drive.files
+            .get({ fileId, fields: "id, name" })
+            .then(async (getfile) => {
+              setMessage("Generating File Link");
               let addfile = await axios.post(
                 API_URL + "/links/add/drive",
                 {
-                  ...getfile.data,
+                  ...getfile.result,
                 },
                 { headers: { authorization: ADMIN_TOKEN } }
               );
               if (addfile.data.message) {
-                setTimeout(() => {
-                  console.log(addfile.data.message);
-                  console.log(window.location.origin + "/drive/" + fileId);
-                }, 250);
+                setMessage(
+                  <p>
+                    {addfile.data.message} <br /> <b>Link:</b>
+                    <a
+                      target="_blank"
+                      href={window.location.origin + "/drive/" + fileId}
+                    >
+                      {window.location.origin + "/drive/" + fileId}
+                    </a>
+                  </p>
+                );
+                setLink("");
               } else {
-                addfile.data === "OK"
-                  ? setTimeout(() => {
-                      console.log("Link Successfully Generated.");
-                      console.log(window.location.origin + "/drive/" + fileId);
-                    }, 250)
-                  : setTimeout(() => {
-                      alert("Error Generating Link, please try again later.");
-                    }, 250);
+                if (addfile.data === "OK") {
+                  setMessage(
+                    <p>
+                      Successfully generated!
+                      <br /> <b>Link:</b>
+                      <a
+                        target="_blank"
+                        href={window.location.origin + "/drive/" + fileId}
+                      >
+                        {window.location.origin + "/drive/" + fileId}
+                      </a>
+                    </p>
+                  );
+                  setLink("");
+                } else {
+                  setMessage("Error Generating Link, please try again later.");
+                }
               }
-            } else {
-              console.log("The file link in not working");
-            }
-          } catch (error) {
-            console.log("The file link in not working");
-          }
+            })
+            .catch((error) => {
+              setMessage("The file link in not working");
+            });
         }
       });
     }

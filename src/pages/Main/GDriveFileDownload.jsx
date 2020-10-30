@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useParams } from "react-router-dom";
-import { API_URL, DRIVE_FOLDER_NAME } from "../../store/consts.js";
+import { API_URL, DRIVE_FOLDER_NAME, ADMIN_TOKEN } from "../../store/consts.js";
 import NotFound from "../NotFound/NotFound";
 import Loader from "../../components/Loader";
 import prettyBytes from "pretty-bytes";
@@ -18,18 +18,34 @@ export default function GDriveFileDownload({ user, handleAuthClick }) {
       getFile();
     }
     async function getFile() {
-      try {
-        let result = await axios.post(API_URL + "/links/getFile", { fileId });
-        if (result.data.fileExists) {
-          setFile(result.data.file);
-          console.log(result.data.file);
-        } else {
+      axios
+        .get(API_URL + "/links/drive/" + fileId, {
+          headers: { authorization: ADMIN_TOKEN },
+        })
+        .then((res) => {
+          window.gapi.client.drive.files
+            .get({
+              fileId,
+              fields: "id, name, size, mimeType, hasThumbnail,thumbnailLink",
+            })
+            .then((drive) => {
+              if (res.data.fileExists) {
+                setFile(drive.result);
+                setLoading(false);
+              } else {
+                setFile(false);
+                setLoading(false);
+              }
+            })
+            .catch((error) => {
+              setFile(false);
+              setLoading(false);
+            });
+        })
+        .catch((err) => {
           setFile(false);
-        }
-        setLoading(false);
-      } catch (error) {
-        setLoading(false);
-      }
+          setLoading(false);
+        });
     }
   }, [fileId]);
 

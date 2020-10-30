@@ -18,7 +18,8 @@ export default function AdminNavBar({ adminIsLoggedin }) {
             data-target="#navbarNav"
             aria-controls="navbarNav"
             aria-expanded="false"
-            aria-label="Toggle navigation">
+            aria-label="Toggle navigation"
+          >
             <span className="navbar-toggler-icon"></span>
           </button>
         ) : null}
@@ -27,12 +28,52 @@ export default function AdminNavBar({ adminIsLoggedin }) {
           <div className="collapse navbar-collapse" id="navbarNav">
             <ul className="navbar-nav ml-auto">
               <li className="my-auto ml-4">
+                <Link className="btn btn-link" to="/admin/dashboard/users">
+                  <img src="https://img.icons8.com/material-rounded/26/ffffff/user-group-man-woman.png" />{" "}
+                  <h5
+                    className="font-weight-normal text-white mt-1"
+                    style={{ fontSize: "1rem" }}
+                  >
+                    Users
+                  </h5>
+                </Link>
+              </li>
+              <li className="my-auto ml-4">
+                <Link
+                  className="btn btn-link"
+                  to="/admin/dashboard/links/drive"
+                >
+                  <img src="https://img.icons8.com/android/26/ffffff/google-drive.png" />
+                  <h5
+                    className="font-weight-normal text-white mt-1"
+                    style={{ fontSize: "1rem" }}
+                  >
+                    GDrive
+                  </h5>
+                </Link>
+              </li>
+              <li className="my-auto ml-4">
+                <Link
+                  className="btn btn-link"
+                  to="/admin/dashboard/links/yandex"
+                >
+                  <img src="https://img.icons8.com/windows/26/ffffff/yandex-international.png" />
+                  <h5
+                    className="font-weight-normal text-white mt-1"
+                    style={{ fontSize: "1rem" }}
+                  >
+                    Yandex
+                  </h5>
+                </Link>
+              </li>
+              <li className="my-auto ml-4">
                 <Link className="btn btn-link" to="/admin/add-links">
-                  <img
-                    alt="logout"
-                    src="https://img.icons8.com/material-outlined/26/ffffff/guest-male.png"></img>
-                  <h5 className="font-weight-normal text-white">
-                    Generate Links
+                  <img src="https://img.icons8.com/fluent-systems-filled/26/ffffff/link.png" />
+                  <h5
+                    className="font-weight-normal text-white mt-1"
+                    style={{ fontSize: "1rem" }}
+                  >
+                    Generator
                   </h5>
                 </Link>
               </li>
@@ -40,8 +81,14 @@ export default function AdminNavBar({ adminIsLoggedin }) {
                 <Link className="btn btn-link my-auto" to="/admin/account">
                   <img
                     alt="logout"
-                    src="https://img.icons8.com/material-outlined/26/ffffff/guest-male.png"></img>
-                  <h5 className="font-weight-normal text-white">Account</h5>
+                    src="https://img.icons8.com/material-outlined/26/ffffff/guest-male.png"
+                  ></img>
+                  <h5
+                    className="font-weight-normal text-white mt-1"
+                    style={{ fontSize: "1rem" }}
+                  >
+                    Account
+                  </h5>
                 </Link>
               </li>
               <li className="my-auto ml-4">
@@ -51,11 +98,18 @@ export default function AdminNavBar({ adminIsLoggedin }) {
                     window.localStorage.removeItem("adminToken");
                     window.localStorage.removeItem("admin");
                     window.location.reload();
-                  }}>
+                  }}
+                >
                   <img
                     alt="logout"
-                    src="https://img.icons8.com/material-outlined/26/ffffff/lock-2.png"></img>
-                  <h5 className="font-weight-normal text-white ml-1">Logout</h5>
+                    src="https://img.icons8.com/material-outlined/26/ffffff/lock-2.png"
+                  ></img>
+                  <h5
+                    className="font-weight-normal text-white mt-1 ml-1"
+                    style={{ fontSize: "1rem" }}
+                  >
+                    Logout
+                  </h5>
                 </div>
               </li>
             </ul>

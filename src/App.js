@@ -16,7 +16,8 @@ import PrivacyPolicy from "./pages/Main/PrivacyPolicy";
 import NotFound from "./pages/NotFound/NotFound";
 import AdminDashboard from "./pages/Admin/Dashboard/Dashboard";
 import DashboardUsers from "./pages/Admin/Dashboard/Users";
-import DashboardLinks from "./pages/Admin/Dashboard/Links";
+import DriveLinks from "./pages/Admin/Dashboard/DriveLinks";
+import YandexLinks from "./pages/Admin/Dashboard/YandexLinks";
 import AdminLogin from "./pages/Admin/Login/Login";
 import AdminAccount from "./pages/Admin/Pages/Account";
 import AddLinks from "./pages/Admin/Pages/AddLinks";
@@ -121,10 +122,18 @@ export default function App() {
                 <Redirect to={{ pathname: "/admin/login" }} />
               )}
             </Route>
-            <Route exact path="/admin/dashboard/links">
+            <Route exact path="/admin/dashboard/links/drive">
               <AdminNavBar adminIsLoggedin={adminIsLoggedin} />
               {adminIsLoggedin ? (
-                <DashboardLinks />
+                <DriveLinks />
+              ) : (
+                <Redirect to={{ pathname: "/admin/login" }} />
+              )}
+            </Route>
+            <Route exact path="/admin/dashboard/links/yandex">
+              <AdminNavBar adminIsLoggedin={adminIsLoggedin} />
+              {adminIsLoggedin ? (
+                <YandexLinks />
               ) : (
                 <Redirect to={{ pathname: "/admin/login" }} />
               )}
