@@ -6,6 +6,7 @@ import { toastError, toastSuccess } from "../../../Helpers/toasts";
 import _debounce from "lodash/debounce";
 import moment from "moment";
 import prettyBytes from "pretty-bytes";
+import { CopyToClipboard } from "react-copy-to-clipboard";
 
 //material table
 import { makeStyles } from "@material-ui/core/styles";
@@ -46,20 +47,20 @@ export default function YandexLinks() {
     const [overlay, setOverlay] = useState(false);
     const [activeAction, setActiveAction] = useState("");
 
-    const ActionDropdown = ({ slug, _id }) => {
+    const ActionDropdown = ({ link }) => {
       const [show, setShow] = useState(false);
       const [deleting, setDeleting] = useState(false);
 
       function removeLink() {
         setDeleting(true);
         axios
-          .delete(API_URL + "/links/" + _id, {
+          .delete(API_URL + "/links/" + link._id, {
             headers: { authorization: ADMIN_TOKEN },
           })
           .then((result) => {
             toastSuccess("Link was successfully removed");
             setDeleting(false);
-            setLinks(links.filter((link) => link._id !== _id));
+            setLinks(links.filter((L) => L._id !== link._id));
           })
           .catch((err) => {
             toastError("Link could not be removed");
@@ -68,30 +69,19 @@ export default function YandexLinks() {
       }
 
       useEffect(() => {
-        if (overlay && activeAction === _id) {
+        if (overlay && activeAction === link._id) {
           setShow(true);
         }
       }, [overlay]);
 
       return (
         <div>
-          <div
-            className="btn btn-lg"
-            style={{ position: "relative", zIndex: "1000" }}
-            onClick={() => {
-              setOverlay(true);
-              setActiveAction(_id);
-              setShow(!show);
-            }}
-          >
-            <Icon>keyboard_arrow_down</Icon>
-          </div>
           {show ? (
             <div
               style={{
                 padding: "5px",
                 position: "absolute",
-                right: "10%",
+                right: "6.5%",
                 zIndex: "1001",
               }}
               className="bg-light p-3 border border-secondary rounded"
@@ -99,19 +89,31 @@ export default function YandexLinks() {
               <p className="btn p-0 m-0">
                 <a
                   className="text-black d-flex align-content-center"
-                  href={window.location.origin + "/y/" + slug}
+                  href={window.location.origin + "/d/" + link.slug}
                   target="_blank"
                 >
                   <Icon className="mr-2">launch</Icon>
-                  Open
+                  Open Link
                 </a>
               </p>
-              <hr className="p-0 my-2" />
+
+              <br />
+              <CopyToClipboard
+                className="btn p-0 m-0 mt-2"
+                text={window.location.origin + "/d/" + link.slug}
+              >
+                <p className="btn p-0 m-0">
+                  <Icon className="mr-2 mt-2">content_copy</Icon>
+                  Copy Link
+                </p>
+              </CopyToClipboard>
+
+              <hr className="p-0" />
               <button className="btn p-0 m-0">
                 <p
-                  className="text-danger d-flex align-content-center"
+                  className="text-danger d-flex align-content-center p-0 m-0"
                   onClick={() => {
-                    removeLink(_id);
+                    removeLink(link._id);
                   }}
                 >
                   <Icon className="mr-2">delete</Icon>
@@ -120,6 +122,17 @@ export default function YandexLinks() {
               </button>
             </div>
           ) : null}
+          <div
+            className="btn btn-lg"
+            style={{ position: "relative", zIndex: "1000" }}
+            onClick={() => {
+              setOverlay(true);
+              setActiveAction(link._id);
+              setShow(!show);
+            }}
+          >
+            <Icon>keyboard_arrow_down</Icon>
+          </div>
         </div>
       );
     };
@@ -173,7 +186,7 @@ export default function YandexLinks() {
                     </pre>
                   </TableCell>
                   <TableCell>
-                    <ActionDropdown _id={row._id} slug={row.slug} />
+                    <ActionDropdown link={row} />
                   </TableCell>
                 </TableRow>
               ))}

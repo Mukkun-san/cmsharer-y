@@ -6,6 +6,7 @@ import { toastError, toastSuccess } from "../../../Helpers/toasts";
 import _debounce from "lodash/debounce";
 import moment from "moment";
 import prettyBytes from "pretty-bytes";
+import { CopyToClipboard } from "react-copy-to-clipboard";
 
 //material table
 import Table from "@material-ui/core/Table";
@@ -74,23 +75,12 @@ export default function DriveLinks() {
 
       return (
         <div>
-          <div
-            className="btn btn-lg"
-            style={{ position: "relative", zIndex: "1000" }}
-            onClick={() => {
-              setOverlay(true);
-              setActiveAction(link._id);
-              setShow(!show);
-            }}
-          >
-            <Icon>keyboard_arrow_down</Icon>
-          </div>
           {show ? (
             <div
               style={{
                 padding: "5px",
                 position: "absolute",
-                right: "10%",
+                right: "6.5%",
                 zIndex: "1001",
               }}
               className="bg-light p-3 border border-secondary rounded"
@@ -102,13 +92,25 @@ export default function DriveLinks() {
                   target="_blank"
                 >
                   <Icon className="mr-2">launch</Icon>
-                  Open
+                  Open Link
                 </a>
               </p>
-              <hr className="p-0 my-2" />
+
+              <br />
+              <CopyToClipboard
+                className="btn p-0 m-0 mt-2"
+                text={window.location.origin + "/d/" + link.slug}
+              >
+                <p className="btn p-0 m-0">
+                  <Icon className="mr-2 mt-2">content_copy</Icon>
+                  Copy Link
+                </p>
+              </CopyToClipboard>
+
+              <hr className="p-0" />
               <button className="btn p-0 m-0">
                 <p
-                  className="text-danger d-flex align-content-center"
+                  className="text-danger d-flex align-content-center p-0 m-0"
                   onClick={() => {
                     removeLink(link._id);
                   }}
@@ -119,6 +121,17 @@ export default function DriveLinks() {
               </button>
             </div>
           ) : null}
+          <div
+            className="btn btn-lg"
+            style={{ position: "relative", zIndex: "1000" }}
+            onClick={() => {
+              setOverlay(true);
+              setActiveAction(link._id);
+              setShow(!show);
+            }}
+          >
+            <Icon>keyboard_arrow_down</Icon>
+          </div>
         </div>
       );
     };
@@ -146,7 +159,16 @@ export default function DriveLinks() {
                     {i + 1}
                   </TableCell>
                   <TableCell align="left">{row.fileName}</TableCell>
-                  <TableCell align="left">{row.fileId}</TableCell>
+                  <TableCell align="left">
+                    {" "}
+                    <a
+                      href={"https://drive.google.com/open?id=" + row.fileId}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      {row.fileId}
+                    </a>
+                  </TableCell>
                   <TableCell align="left">
                     {prettyBytes(Number(row.size) || 0)}
                   </TableCell>

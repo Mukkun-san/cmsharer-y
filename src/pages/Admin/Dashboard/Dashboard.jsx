@@ -69,7 +69,7 @@ export default function Dashboard() {
             } else {
               toastSuccess("Link Successfully Generated.");
               setGeneratedLink(
-                window.location.origin + "/drive/" + addfile.data.slug
+                window.location.origin + "/d/" + addfile.data.slug
               );
             }
           } catch (error) {}

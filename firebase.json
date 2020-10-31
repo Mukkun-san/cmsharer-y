@@ -1,11 +1,13 @@
 {
-    "hosting": {
-        "public": "build",
-        "site": "cmsharer",
-        "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
-        "rewrites": [{
-            "source": "**",
-            "destination": "/index.html"
-        }]
-    }
+  "hosting": {
+    "public": "build",
+    "site": "cm-sharer",
+    "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
+    "rewrites": [
+      {
+        "source": "**",
+        "destination": "/index.html"
+      }
+    ]
+  }
 }

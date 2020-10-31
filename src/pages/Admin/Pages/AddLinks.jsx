@@ -10,7 +10,9 @@ export default function AddLinks() {
     const [link, setLink] = useState("");
     const [message, setMessage] = useState(null);
     const [loading, setLoading] = useState(false);
+
     const [bulkLoading, setBulkLoading] = useState(false);
+    const [generatedLinks, setGeneratedLinks] = useState([]);
 
     const [inBulk, setInBulk] = useState(false);
     const [byID, setByID] = useState(true);
@@ -77,19 +79,26 @@ export default function AddLinks() {
             }
           })
           .catch((error) => {
-            setMessage("The file link in not working");
+            setMessage("Problem generating file");
           });
       }
       setLoading(false);
     }
 
     function generateBulk() {
-      bulkLinks.split("\n").forEach(async (line, i) => {
+      setGeneratedLinks(true);
+      setBulkLoading(true);
+      let allLinks = [];
+      let loading = [];
+      bulkLinks.split("\n").forEach(async (line, idx) => {
+        loading.push(true);
+        allLinks.push({});
         const linkRegExp = new RegExp("^https://drive.google.com/file/d/", "i");
-        if (!line) {
-          console.log("Enter a drive file link to generate");
-        } else if (!byID && !line.match(linkRegExp)) {
-          console.log("'" + line + "' is not a valid drive file link!");
+        if (!byID && !line.match(linkRegExp)) {
+          loading[idx] = false;
+          allLinks[idx] = {
+            msg: "'" + line + "' is not a valid drive file link!",
+          };
         } else {
           let fileId = line.trim();
           if (!byID) {
@@ -103,49 +112,38 @@ export default function AddLinks() {
                 "id, name, size, mimeType,description, videoMediaMetadata",
             })
             .then(async (getfile) => {
-              setMessage("Generating File Link");
               let addfile = await axios.post(
                 API_URL + "/links/add/drive",
                 getfile.result,
                 { headers: { authorization: ADMIN_TOKEN } }
               );
-              if (addfile.data.message) {
-                setMessage(
-                  <p>
-                    {addfile.data.message} <br /> <b>Link:</b>
-                    <a
-                      target="_blank"
-                      href={window.location.origin + "/d/" + addfile.data.slug}
-                    >
-                      {window.location.origin + "/d/" + addfile.data.slug}
-                    </a>
-                  </p>
-                );
-                setLink("");
+              if (addfile.data) {
+                allLinks[idx] = {
+                  msg: addfile.data.message,
+                  link: addfile.data.slug
+                    ? window.location.origin + "/d/" + addfile.data.slug
+                    : null,
+                };
               } else {
-                if (addfile.data === "OK") {
-                  setMessage(
-                    <p>
-                      Successfully generated!
-                      <br /> <b>Link:</b>
-                      <a
-                        target="_blank"
-                        href={
-                          window.location.origin + "/d/" + addfile.data.slug
-                        }
-                      >
-                        {window.location.origin + "/d/" + addfile.data.slug}
-                      </a>
-                    </p>
-                  );
-                  setLink("");
-                } else {
-                  setMessage("Error Generating Link, please try again later.");
-                }
+                allLinks[idx] = {
+                  msg: "Problem generating link",
+                };
+              }
+              loading[idx] = false;
+              if (loading.every((L) => !L)) {
+                setGeneratedLinks(allLinks);
+                setBulkLoading(false);
               }
             })
             .catch((error) => {
-              setMessage("The file link in not working");
+              loading[idx] = false;
+              allLinks[idx] = {
+                msg: "Problem generating link",
+              };
+              if (loading.every((L) => !L)) {
+                setGeneratedLinks(allLinks);
+                setBulkLoading(false);
+              }
             });
         }
       });
@@ -262,6 +260,37 @@ export default function AddLinks() {
                     Generate All
                   </button>
                 </div>
+                <div className="row mx-auto mt-3">
+                  {bulkLoading ? (
+                    <div
+                      className="spinner-border text-primary mx-auto"
+                      role="status"
+                    >
+                      <span className="sr-only text-primary">Loading...</span>
+                    </div>
+                  ) : null}{" "}
+                </div>
+                <div className="bg-light my-3 mx-5">
+                  {generatedLinks && generatedLinks.length
+                    ? generatedLinks.map((L, i) => {
+                        return (
+                          <div key={"yadisk-link" + i}>
+                            <b>{i + 1}- </b>
+                            {L.msg}:{" "}
+                            {L.link ? (
+                              <a
+                                href={L.link}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                              >
+                                OPEN LINK
+                              </a>
+                            ) : null}
+                          </div>
+                        );
+                      })
+                    : null}
+                </div>
               </div>
             ) : (
               <div className="form-group my-4">
@@ -315,7 +344,7 @@ export default function AddLinks() {
   function YandexDisk() {
     const [link, setLink] = useState("");
 
-    const [bulking, setBulking] = useState();
+    const [bulkLoading, setBulkLoading] = useState(false);
     const [generatedLinks, setGeneratedLinks] = useState([]);
 
     const [validation, setValidation] = useState({});
@@ -339,7 +368,7 @@ export default function AddLinks() {
           if (result.data.slug) {
             setMessage(
               <p>
-                "File available at: " +
+                File available at:
                 <a
                   href={window.location.origin + "/y/" + result.data.slug}
                   target="_blank"
@@ -359,10 +388,13 @@ export default function AddLinks() {
     }
 
     function generateBulk() {
-      setMessage("Checking links...");
+      setGeneratedLinks([]);
       let bulkLoading = [];
+      let allLinks = [];
+      setBulkLoading(true);
       bulkLinks.split("\n").forEach((link, linkNb) => {
         bulkLoading.push(true);
+        allLinks.push({});
         axios
           .post(
             API_URL + "/links/add/yandex",
@@ -370,13 +402,17 @@ export default function AddLinks() {
             { headers: { authorization: ADMIN_TOKEN } }
           )
           .then((result) => {
-            if (result.data.slug) {
-              setGeneratedLinks([...generatedLinks, linkNb]);
-
-              console.log(generatedLinks);
+            if (result.data) {
+              allLinks[linkNb] = {
+                msg: result.data.message,
+                link: window.location.origin + "/y/" + result.data.slug,
+              };
             }
             bulkLoading[linkNb] = false;
             if (bulkLoading.every((x) => !x)) {
+              setBulkLoading(false);
+              setGeneratedLinks(allLinks);
+              window.bulklinks = allLinks;
               console.log("finished:", generatedLinks);
             }
           })
@@ -466,6 +502,37 @@ export default function AddLinks() {
                   >
                     Generate All
                   </button>
+                </div>
+                {bulkLoading ? (
+                  <div className="row mx-auto mt-3">
+                    <div
+                      className="spinner-border text-primary mx-auto"
+                      role="status"
+                    >
+                      <span className="sr-only text-primary">Loading...</span>
+                    </div>
+                  </div>
+                ) : null}
+                <div className="bg-light my-3 mx-5">
+                  {generatedLinks && generatedLinks.length
+                    ? generatedLinks.map((L, i) => {
+                        return (
+                          <div key={"yadisk-link" + i}>
+                            <b>{i + 1}- </b>
+                            {L.msg}:{" "}
+                            {L.link ? (
+                              <a
+                                href={L.link}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                              >
+                                OPEN LINK
+                              </a>
+                            ) : null}
+                          </div>
+                        );
+                      })
+                    : null}
                 </div>
               </div>
             ) : (
