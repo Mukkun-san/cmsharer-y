@@ -5,6 +5,7 @@ import Loader from "../../../components/Loader";
 import { toastError, toastSuccess } from "../../../Helpers/toasts";
 import _debounce from "lodash/debounce";
 import moment from "moment";
+import prettyBytes from "pretty-bytes";
 
 //material table
 import Table from "@material-ui/core/Table";
@@ -25,9 +26,13 @@ export default function DriveLinks() {
 
   function fetchAllLinks() {
     axios
-      .get(API_URL + "/links/gdrive", {
-        headers: { authorization: ADMIN_TOKEN },
-      })
+      .post(
+        API_URL + "/links/search",
+        { type: "gdrive", q: "" },
+        {
+          headers: { authorization: ADMIN_TOKEN },
+        }
+      )
       .then((res) => {
         setLinks(res.data);
       })
@@ -40,20 +45,20 @@ export default function DriveLinks() {
     const [overlay, setOverlay] = useState(false);
     const [activeAction, setActiveAction] = useState("");
 
-    const ActionDropdown = ({ fileId, _id }) => {
+    const ActionDropdown = ({ link }) => {
       const [show, setShow] = useState(false);
       const [deleting, setDeleting] = useState(false);
 
       function removeLink() {
         setDeleting(true);
         axios
-          .delete(API_URL + "/links/" + _id, {
+          .delete(API_URL + "/links/" + link._id, {
             headers: { authorization: ADMIN_TOKEN },
           })
           .then((result) => {
             toastSuccess("Link was successfully removed");
             setDeleting(false);
-            setLinks(links.filter((link) => link._id !== _id));
+            setLinks(links.filter((L) => L._id !== link._id));
           })
           .catch((err) => {
             toastError("Link could not be removed");
@@ -62,7 +67,7 @@ export default function DriveLinks() {
       }
 
       useEffect(() => {
-        if (overlay && activeAction === _id) {
+        if (overlay && activeAction === link._id) {
           setShow(true);
         }
       }, [overlay]);
@@ -74,7 +79,7 @@ export default function DriveLinks() {
             style={{ position: "relative", zIndex: "1000" }}
             onClick={() => {
               setOverlay(true);
-              setActiveAction(_id);
+              setActiveAction(link._id);
               setShow(!show);
             }}
           >
@@ -93,7 +98,7 @@ export default function DriveLinks() {
               <p className="btn p-0 m-0">
                 <a
                   className="text-black d-flex align-content-center"
-                  href={window.location.origin + "/drive/" + fileId}
+                  href={window.location.origin + "/d/" + link.slug}
                   target="_blank"
                 >
                   <Icon className="mr-2">launch</Icon>
@@ -105,7 +110,7 @@ export default function DriveLinks() {
                 <p
                   className="text-danger d-flex align-content-center"
                   onClick={() => {
-                    removeLink(_id);
+                    removeLink(link._id);
                   }}
                 >
                   <Icon className="mr-2">delete</Icon>
@@ -142,7 +147,9 @@ export default function DriveLinks() {
                   </TableCell>
                   <TableCell align="left">{row.fileName}</TableCell>
                   <TableCell align="left">{row.fileId}</TableCell>
-                  <TableCell align="left">-</TableCell>
+                  <TableCell align="left">
+                    {prettyBytes(Number(row.size) || 0)}
+                  </TableCell>
                   <TableCell align="left">-</TableCell>
                   <TableCell align="left">{row.downloads}</TableCell>
                   <TableCell align="center">
@@ -157,7 +164,7 @@ export default function DriveLinks() {
                     </pre>
                   </TableCell>
                   <TableCell>
-                    <ActionDropdown _id={row._id} fileId={row.fileId} />
+                    <ActionDropdown link={row} />
                   </TableCell>
                 </TableRow>
               ))}

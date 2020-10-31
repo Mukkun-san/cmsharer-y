@@ -173,7 +173,7 @@ export default function App() {
             <Route path="/admin/">
               <Redirect to={{ pathname: "/admin/login" }} />
             </Route>
-            <Route exact path="/drive/:fileId">
+            <Route exact path="/d/:slug">
               <NavBar currentUser={user} />
               <GDriveFileDownload
                 user={user}

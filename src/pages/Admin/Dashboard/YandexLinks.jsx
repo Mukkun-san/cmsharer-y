@@ -5,6 +5,7 @@ import Loader from "../../../components/Loader";
 import { toastError, toastSuccess } from "../../../Helpers/toasts";
 import _debounce from "lodash/debounce";
 import moment from "moment";
+import prettyBytes from "pretty-bytes";
 
 //material table
 import { makeStyles } from "@material-ui/core/styles";
@@ -26,9 +27,13 @@ export default function YandexLinks() {
 
   function fetchAllLinks() {
     axios
-      .get(API_URL + "/links/yandex", {
-        headers: { authorization: ADMIN_TOKEN },
-      })
+      .post(
+        API_URL + "/links/search",
+        { type: "yandex", q: "" },
+        {
+          headers: { authorization: ADMIN_TOKEN },
+        }
+      )
       .then((res) => {
         setLinks(res.data);
       })
@@ -151,7 +156,9 @@ export default function YandexLinks() {
                       {row.public_key}
                     </a>
                   </TableCell>
-                  <TableCell align="left">-</TableCell>
+                  <TableCell align="left">
+                    {prettyBytes(Number(row.size) || 0)}
+                  </TableCell>
                   <TableCell align="left">-</TableCell>
                   <TableCell align="left">{row.downloads}</TableCell>
                   <TableCell align="center">

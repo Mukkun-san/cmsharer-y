@@ -50,7 +50,10 @@ export default function Dashboard() {
       setloadingLinkGen(true);
       setLoadingMsg("Checking Drive File Link...");
       window.gapi.client.drive.files
-        .get({ fileId, fields: "*" })
+        .get({
+          fileId,
+          fields: "id, name, size, mimeType,description, videoMediaMetadata",
+        })
         .then(async (getfile) => {
           setLoadingMsg("Generating File Link");
           try {
@@ -60,23 +63,14 @@ export default function Dashboard() {
               { headers: { authorization: ADMIN_TOKEN } }
             );
             if (addfile.data.message) {
-              setTimeout(() => {
-                toastWarning(addfile.data.message);
-                setGeneratedLink(window.location.origin + "/drive/" + fileId);
-              }, 250);
+              toastWarning(addfile.data.message);
+            } else if (addfile.data.error) {
+              toastError(addfile.data.message);
             } else {
-              addfile.data === "OK"
-                ? setTimeout(() => {
-                    toastSuccess("Link Successfully Generated.");
-                    setGeneratedLink(
-                      window.location.origin + "/drive/" + fileId
-                    );
-                  }, 250)
-                : setTimeout(() => {
-                    toastError(
-                      "Error Generating Link, please try again later."
-                    );
-                  }, 250);
+              toastSuccess("Link Successfully Generated.");
+              setGeneratedLink(
+                window.location.origin + "/drive/" + addfile.data.slug
+              );
             }
           } catch (error) {}
 

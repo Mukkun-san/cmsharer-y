@@ -32,14 +32,15 @@ export default function AddLinks() {
         }
         setMessage("Checking Drive File...");
         window.gapi.client.drive.files
-          .get({ fileId, fields: "id, name" })
+          .get({
+            fileId,
+            fields: "id, name, size, mimeType,description, videoMediaMetadata",
+          })
           .then(async (getfile) => {
             setMessage("Generating File Link");
             let addfile = await axios.post(
               API_URL + "/links/add/drive",
-              {
-                ...getfile.result,
-              },
+              getfile.result,
               { headers: { authorization: ADMIN_TOKEN } }
             );
             if (addfile.data.message) {
@@ -48,9 +49,9 @@ export default function AddLinks() {
                   {addfile.data.message} <br /> <b>Link:</b>
                   <a
                     target="_blank"
-                    href={window.location.origin + "/drive/" + fileId}
+                    href={window.location.origin + "/d/" + addfile.data.slug}
                   >
-                    {window.location.origin + "/drive/" + fileId}
+                    {window.location.origin + "/d/" + addfile.data.slug}
                   </a>
                 </p>
               );
@@ -63,9 +64,9 @@ export default function AddLinks() {
                     <br /> <b>Link:</b>
                     <a
                       target="_blank"
-                      href={window.location.origin + "/drive/" + fileId}
+                      href={window.location.origin + "/d/" + addfile.data.slug}
                     >
-                      {window.location.origin + "/drive/" + fileId}
+                      {window.location.origin + "/d/" + addfile.data.slug}
                     </a>
                   </p>
                 );
@@ -96,14 +97,16 @@ export default function AddLinks() {
             fileId = part1.substring(0, part1.indexOf("/"));
           }
           window.gapi.client.drive.files
-            .get({ fileId, fields: "id, name" })
+            .get({
+              fileId,
+              fields:
+                "id, name, size, mimeType,description, videoMediaMetadata",
+            })
             .then(async (getfile) => {
               setMessage("Generating File Link");
               let addfile = await axios.post(
                 API_URL + "/links/add/drive",
-                {
-                  ...getfile.result,
-                },
+                getfile.result,
                 { headers: { authorization: ADMIN_TOKEN } }
               );
               if (addfile.data.message) {
@@ -112,9 +115,9 @@ export default function AddLinks() {
                     {addfile.data.message} <br /> <b>Link:</b>
                     <a
                       target="_blank"
-                      href={window.location.origin + "/drive/" + fileId}
+                      href={window.location.origin + "/d/" + addfile.data.slug}
                     >
-                      {window.location.origin + "/drive/" + fileId}
+                      {window.location.origin + "/d/" + addfile.data.slug}
                     </a>
                   </p>
                 );
@@ -127,9 +130,11 @@ export default function AddLinks() {
                       <br /> <b>Link:</b>
                       <a
                         target="_blank"
-                        href={window.location.origin + "/drive/" + fileId}
+                        href={
+                          window.location.origin + "/d/" + addfile.data.slug
+                        }
                       >
-                        {window.location.origin + "/drive/" + fileId}
+                        {window.location.origin + "/d/" + addfile.data.slug}
                       </a>
                     </p>
                   );
@@ -149,7 +154,6 @@ export default function AddLinks() {
     function reset() {
       setMessage("");
       setLoading(false);
-      setBulkLoading(false);
     }
 
     return (
@@ -312,11 +316,11 @@ export default function AddLinks() {
     const [link, setLink] = useState("");
 
     const [bulking, setBulking] = useState();
+    const [generatedLinks, setGeneratedLinks] = useState([]);
 
     const [validation, setValidation] = useState({});
     const [message, setMessage] = useState(null);
     const [loading, setLoading] = useState(false);
-    const [bulkLoading, setBulkLoading] = useState(false);
 
     const [inBulk, setInBulk] = useState(false);
     const [bulkLinks, setBulkLinks] = useState("");
@@ -355,8 +359,10 @@ export default function AddLinks() {
     }
 
     function generateBulk() {
-      setMessage("Please Wait.. ( check console xD )");
-      bulkLinks.split("\n").forEach((link) => {
+      setMessage("Checking links...");
+      let bulkLoading = [];
+      bulkLinks.split("\n").forEach((link, linkNb) => {
+        bulkLoading.push(true);
         axios
           .post(
             API_URL + "/links/add/yandex",
@@ -364,21 +370,18 @@ export default function AddLinks() {
             { headers: { authorization: ADMIN_TOKEN } }
           )
           .then((result) => {
-            console.log(result);
             if (result.data.slug) {
-              setMessage(
-                "File available at: " +
-                  window.location.origin +
-                  "/y/" +
-                  result.data.slug
-              );
-            } else {
-              setMessage(result.data.message);
+              setGeneratedLinks([...generatedLinks, linkNb]);
+
+              console.log(generatedLinks);
+            }
+            bulkLoading[linkNb] = false;
+            if (bulkLoading.every((x) => !x)) {
+              console.log("finished:", generatedLinks);
             }
           })
           .catch((err) => {
             setMessage("Error occured");
-            console.log(err);
           });
       });
     }
@@ -386,7 +389,6 @@ export default function AddLinks() {
     function reset() {
       setMessage("");
       setLoading(false);
-      setBulkLoading(false);
     }
 
     return (

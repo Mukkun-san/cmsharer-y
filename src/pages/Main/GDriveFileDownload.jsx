@@ -7,47 +7,48 @@ import Loader from "../../components/Loader";
 import prettyBytes from "pretty-bytes";
 
 export default function GDriveFileDownload({ user, handleAuthClick }) {
-  let { fileId } = useParams();
+  let { slug } = useParams();
   const [file, setFile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [downloading, setDownloading] = useState(false);
 
   useEffect(() => {
     setLoading(true);
-    if (fileId) {
+    if (slug) {
       getFile();
     }
     async function getFile() {
       axios
-        .get(API_URL + "/links/drive/" + fileId, {
+        .get(API_URL + "/links/drive/" + slug, {
           headers: { authorization: ADMIN_TOKEN },
         })
         .then((res) => {
-          window.gapi.client.drive.files
-            .get({
-              fileId,
-              fields: "id, name, size, mimeType, hasThumbnail,thumbnailLink",
-            })
-            .then((drive) => {
-              if (res.data.fileExists) {
-                setFile(drive.result);
+          console.log(res);
+          if (res.data.fileExists) {
+            window.gapi.client.drive.files
+              .get({
+                fileId: res.data.fileId,
+                fields: "id, name, size, mimeType, hasThumbnail,thumbnailLink",
+              })
+              .then((drive) => {
+                setFile({ ...drive.result, ...res.data });
                 setLoading(false);
-              } else {
+              })
+              .catch((error) => {
                 setFile(false);
                 setLoading(false);
-              }
-            })
-            .catch((error) => {
-              setFile(false);
-              setLoading(false);
-            });
+              });
+          } else {
+            setFile(false);
+            setLoading(false);
+          }
         })
         .catch((err) => {
           setFile(false);
           setLoading(false);
         });
     }
-  }, [fileId]);
+  }, [slug]);
 
   function DownloadFile() {
     function DownloadBtnIcon({ downloading }) {
@@ -77,7 +78,7 @@ export default function GDriveFileDownload({ user, handleAuthClick }) {
       async function ddl(folderId) {
         try {
           let response = await window.gapi.client.drive.files.copy({
-            fileId,
+            fileId: file.fileId,
             fields: "parents, id",
           });
           const previousParents = response.result.parents.join(",");
@@ -91,8 +92,12 @@ export default function GDriveFileDownload({ user, handleAuthClick }) {
             resource: { role: "reader", type: "anyone" },
             fileId: response.result.id,
           });
-          await axios.post(API_URL + "/links/downloadOne", {
-            fileId,
+          // const geoBytes = await axios.get(
+          //   "http://gd.geobytes.com/GetCityDetails"
+          // );
+          // console.log(geoBytes);
+          await axios.post(API_URL + "/links/download", {
+            ...file,
             userId: window.gapi.auth2
               .getAuthInstance()
               .currentUser.get()
@@ -102,6 +107,10 @@ export default function GDriveFileDownload({ user, handleAuthClick }) {
           document.getElementById("DDL").href =
             "https://drive.google.com/uc?export=download&id=" +
             response.result.id;
+          console.log(
+            "file available at : https://drive.google.com/uc?export=download&id=" +
+              response.result.id
+          );
           document.getElementById("DDL").click();
           setDownloading(false);
         } catch (error) {

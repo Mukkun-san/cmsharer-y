@@ -34,7 +34,9 @@ export default function YandexFileDownload() {
           <div className="col-8 mx-auto">
             <div className="card card-signin my-5">
               <div className="card-body">
-                {file ? (
+                {loading ? (
+                  <Loader color="warning" />
+                ) : file ? (
                   <div>
                     <h1>{file.fileName}</h1>
                     <p>SIZE: {prettyBytes(Number(file.size) || 0)}</p>
