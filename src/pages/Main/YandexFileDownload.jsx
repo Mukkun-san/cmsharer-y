@@ -50,7 +50,6 @@ export default function YandexFileDownload() {
         setFile(false);
       });
   }, [slug]);
-  console.log(file);
   return (
     <div>
       <div className="container bg-light w-100 h-100">
@@ -76,15 +75,18 @@ export default function YandexFileDownload() {
                     </span>
                     <br />
                     <img
-                      src={file.preview}
-                      alt=""
-                      className="my-2 w-50 mx-auto"
+                      src={
+                        file.preview
+                          ? file.preview.replace("size=S", "size=L")
+                          : ""
+                      }
+                      alt="preview_image"
+                      className="my-2 w-75 mx-auto"
                     />
                     <br />
                     <hr />
-                    <br />
                     <button
-                      className="btn btn-lg btn-warning"
+                      className="btn btn-lg btn-warning my-0"
                       disabled={ddlWait > 0 ? true : false}
                     >
                       {ddlWait > 0 ? (
