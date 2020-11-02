@@ -258,32 +258,36 @@ export default function GDriveFileDownload({ user, handleAuthClick }) {
                       />
                     </div>
                     <hr />
-                    <p className="float-left p-0 m-0 font-smaller">
-                      Free Space:{" "}
-                      {prettyBytes(
-                        Number(driveInfo.limit) - Number(driveInfo.usage)
-                      )}
-                    </p>
-                    <div
-                      className="progress"
-                      style={{ width: "100%", height: "18px" }}
-                    >
-                      <div
-                        className="progress-bar"
-                        role="progressbar"
-                        style={{
-                          width:
-                            Math.floor(
-                              (Number(driveInfo.usage) /
-                                Number(driveInfo.limit)) *
-                                100
-                            ) + "%",
-                          height: "18px",
-                        }}
-                      >
-                        {prettyBytes(Number(driveInfo.usage))} used
+                    {driveInfo ? (
+                      <div id="driveInfo">
+                        <p className="float-left p-0 m-0 font-smaller">
+                          Free Space:{" "}
+                          {prettyBytes(
+                            Number(driveInfo.limit) - Number(driveInfo.usage)
+                          )}
+                        </p>
+                        <div
+                          className="progress"
+                          style={{ width: "100%", height: "18px" }}
+                        >
+                          <div
+                            className="progress-bar"
+                            role="progressbar"
+                            style={{
+                              width:
+                                Math.floor(
+                                  (Number(driveInfo.usage) /
+                                    Number(driveInfo.limit)) *
+                                    100
+                                ) + "%",
+                              height: "18px",
+                            }}
+                          >
+                            {prettyBytes(Number(driveInfo.usage))} used
+                          </div>
+                        </div>
                       </div>
-                    </div>
+                    ) : null}
                   </div>
                 ) : (
                   <NotFound />

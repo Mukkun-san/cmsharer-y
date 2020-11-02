@@ -45,7 +45,10 @@ export default function App() {
         })
         .then(() => {
           let Oauth = window.gapi.auth2.getAuthInstance();
-          Oauth.isSignedIn.listen(setUser(Oauth.currentUser.get()));
+          Oauth.isSignedIn.listen(() => {
+            setUser(Oauth.currentUser.get());
+            window.location.reload();
+          });
           setUser(Oauth.currentUser.get());
         });
     } catch (e) {}
@@ -68,7 +71,7 @@ export default function App() {
         window.location.reload();
       })
       .catch((err) => {
-        console.log(err);
+        window.location.reload();
       });
   }
 
