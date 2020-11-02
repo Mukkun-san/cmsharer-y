@@ -10,6 +10,8 @@ import { API_URL, ADMIN_TOKEN } from "../../../store/consts.js";
 import Loader from "../../../components/Loader";
 import scss from "./styles.module.scss";
 import { Helmet } from "react-helmet";
+import { CopyToClipboard } from "react-copy-to-clipboard";
+import Icon from "@material-ui/core/Icon";
 
 export default function Dashboard() {
   const [loading, setLoading] = useState(true);
@@ -214,6 +216,17 @@ export default function Dashboard() {
                           <p className="success">
                             File Available at:{"   "}
                             <a href={generatedLink}>{generatedLink}</a>
+                            <CopyToClipboard
+                              className="btn p-0 ml-3 mt-2"
+                              text={generatedLink}
+                            >
+                              <p className="btn p-0 m-0 d-flex align-content-center">
+                                <Icon className="mr-2 mt-2">content_copy</Icon>
+                                <b className="my-auto d-flex align-self-center text-center">
+                                  Copy Link
+                                </b>
+                              </p>
+                            </CopyToClipboard>
                           </p>
                         ) : null}
                       </div>
