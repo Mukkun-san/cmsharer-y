@@ -54,13 +54,19 @@ export default function YandexFileDownload() {
                     <Loader color="warning" />
                   </div>
                 ) : file ? (
-                  <div className="justify-content-center">
+                  <div className="text-center">
                     <Helmet>
                       <title>CM Sharer - {file.fileName}</title>
                     </Helmet>
-                    <h1>{file.fileName}</h1>
-                    <p>SIZE: {prettyBytes(Number(file.size) || 0)}</p>
-                    <p>{file.fileType}</p>
+                    <h3>{file.fileName}</h3>
+                    <span className="badge badge-danger mx-2">
+                      SIZE: {prettyBytes(Number(file.size) || 0)}
+                    </span>
+                    <span className="badge badge-warning mx-2">
+                      TYPE: {file.fileType}
+                    </span>
+                    <br />
+                    <hr />
                     <br />
                     <button
                       className="btn btn-lg btn-warning"
