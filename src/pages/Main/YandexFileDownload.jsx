@@ -11,16 +11,14 @@ export default function YandexFileDownload() {
   let { slug } = useParams();
   const [file, setFile] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [downloading, setDownloading] = useState(false);
   let [ddlWait, setDdlWait] = useState(5);
 
   useEffect(() => {
-    getFile();
-    async function getFile() {
-      try {
-        let result = await axios.get(API_URL + "/links/yandex/" + slug, {
-          headers: { authorization: ADMIN_TOKEN },
-        });
+    axios
+      .get(API_URL + "/links/yandex/" + slug, {
+        headers: { authorization: ADMIN_TOKEN },
+      })
+      .then((result) => {
         if (result.data.linkExists) {
           setFile(result.data);
           setLoading(false);
@@ -35,11 +33,11 @@ export default function YandexFileDownload() {
         } else {
           setLoading(false);
         }
-      } catch (error) {
+      })
+      .catch((err) => {
         setLoading(false);
         setFile(false);
-      }
-    }
+      });
   }, [slug]);
 
   return (
