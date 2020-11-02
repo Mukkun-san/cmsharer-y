@@ -5,6 +5,7 @@ import { API_URL, DRIVE_FOLDER_NAME, ADMIN_TOKEN } from "../../store/consts.js";
 import NotFound from "../NotFound/NotFound";
 import Loader from "../../components/Loader";
 import prettyBytes from "pretty-bytes";
+import { Helmet } from "react-helmet";
 
 export default function GDriveFileDownload({ user, handleAuthClick }) {
   let { slug } = useParams();
@@ -19,12 +20,11 @@ export default function GDriveFileDownload({ user, handleAuthClick }) {
     }
     async function getFile() {
       axios
-        .get(API_URL + "/links/drive/" + slug, {
+        .get(API_URL + "/links/gdrive/" + slug, {
           headers: { authorization: ADMIN_TOKEN },
         })
         .then((res) => {
-          console.log(res);
-          if (res.data.fileExists) {
+          if (res.data.linkExists) {
             window.gapi.client.drive.files
               .get({
                 fileId: res.data.fileId,
@@ -202,6 +202,9 @@ export default function GDriveFileDownload({ user, handleAuthClick }) {
                   </div>
                 ) : file ? (
                   <div className="text-center">
+                    <Helmet>
+                      <title>CM Sharer - {file.name}</title>
+                    </Helmet>
                     <h3 className="card-title font-weight-regular">
                       {file.name}
                     </h3>
@@ -234,6 +237,7 @@ export default function GDriveFileDownload({ user, handleAuthClick }) {
                 )}
                 <a
                   target="_blank"
+                  rel="noopener noreferrer"
                   href=""
                   id="DDL"
                   style={{ visibility: "hidden", height: 0 }}

@@ -1,9 +1,12 @@
 import React from "react";
+import { Helmet } from "react-helmet";
 
 export default function Account({ user }) {
-
   return (
     <div>
+      <Helmet>
+        <title>CM Sharer - Account</title>
+      </Helmet>
       <div className="card text-center w-75 bg-light mx-auto mt-5 pt-5">
         <div className="card-header">
           <h1>Account Details</h1>

@@ -184,23 +184,23 @@ export default function App() {
               <NavBar currentUser={user} />
               <YandexFileDownload />
             </Route>
-            <Route exact path="/privacy-policy">
+            <Route exact path="/page/privacy-policy">
               <NavBar currentUser={user} />
               <PrivacyPolicy />
             </Route>
-            <Route exact path="/DMCA">
+            <Route exact path="/page/dmca">
               <NavBar currentUser={user} />
               <DMCA />
             </Route>
-            <Route exact path="/terms&conditions">
+            <Route exact path="/page/terms-conditions">
               <NavBar currentUser={user} />
               <Terms />
             </Route>
-            <Route exact path="/contact">
+            <Route exact path="/page/contact">
               <NavBar currentUser={user} />
               <Contact />
             </Route>
-            <Route exact path="/account">
+            <Route exact path="/page/account">
               <NavBar currentUser={user} />
               {user && user.Ca ? (
                 <Account user={user} />
@@ -211,7 +211,7 @@ export default function App() {
             <Route exact path="/">
               <NavBar currentUser={user} />
               {user && user.Ca ? (
-                <Redirect to={{ pathname: "/account" }} />
+                <Redirect to={{ pathname: "/page/account" }} />
               ) : (
                 <Home handleAuthClick={handleAuthClick} />
               )}

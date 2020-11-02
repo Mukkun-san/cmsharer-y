@@ -3,6 +3,7 @@ import axios from "axios";
 import { API_URL, ADMIN_TOKEN } from "../../../store/consts.js";
 import Loader from "../../../components/Loader";
 import { toastError, toastSuccess } from "../../../Helpers/toasts";
+import { Helmet } from "react-helmet";
 
 export default function Users() {
   const [users, setUsers] = useState(null);
@@ -34,6 +35,9 @@ export default function Users() {
 
   return (
     <div>
+      <Helmet>
+        <title>Dashboard - Users</title>
+      </Helmet>
       <br />
       <br />
       {users ? (
@@ -43,9 +47,6 @@ export default function Users() {
               <thead className="thead-dark">
                 <tr>
                   <th className="text-center border border-light m-2">#</th>
-                  <th className="text-center border border-light m-2">
-                    Picture
-                  </th>
                   <th className="text-center border border-light m-2">
                     Username
                   </th>
@@ -64,9 +65,19 @@ export default function Users() {
                     <tr key={user.guid}>
                       <td className="bg-light">{i + 1}</td>
                       <td className="bg-light">
-                        <img src={user.picture} alt="" />
+                        <img
+                          className="my-auto mr-3"
+                          style={{
+                            verticalAlign: "middle",
+                            width: "50px",
+                            height: "50px",
+                            borderRadius: "50%",
+                          }}
+                          src={user.picture}
+                          alt=""
+                        />
+                        <p className="my-auto d-inline">{user.username} </p>
                       </td>
-                      <td className="bg-light">{user.username}</td>
                       <td className="bg-light">{user.email}</td>
                       <td className="bg-light">
                         {user.joinedOn.toString().substring(0, 10)} at{" "}

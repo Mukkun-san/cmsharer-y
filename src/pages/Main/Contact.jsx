@@ -1,8 +1,12 @@
 import React from "react";
+import { Helmet } from "react-helmet";
 
 export default function Contact() {
   return (
     <div>
+      <Helmet>
+        <title>CM Sharer - Contact</title>
+      </Helmet>
       <div className="card text-center w-75 bg-light mx-auto mt-5 mb-5 pt-5">
         <div className="card-header">
           <h1>Contact</h1>

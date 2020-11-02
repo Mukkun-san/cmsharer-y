@@ -1,10 +1,14 @@
 import React from "react";
 import styles from "./styles.module.css";
 import { Link } from "react-router-dom";
+import { Helmet } from "react-helmet";
 
 export default function NotFound() {
   return (
     <div className="container text-center w-100 py-5 my-5">
+      <Helmet>
+        <title>CM Sharer - 404 NOT FOUND</title>
+      </Helmet>
       <div className="row">
         <div className="col-md-12">
           <div className={styles.errorTemplate}>
@@ -20,7 +24,7 @@ export default function NotFound() {
                 <span className="glyphicon glyphicon-home"></span>
                 Take Me Home{" "}
               </Link>
-              <Link to="/contact" className="btn btn-warning btn-lg ml-3">
+              <Link to="/page/contact" className="btn btn-warning btn-lg ml-3">
                 Contact Support
               </Link>
             </div>

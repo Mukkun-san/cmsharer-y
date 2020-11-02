@@ -7,6 +7,7 @@ import {
   toastWarning,
   toastSuccess,
 } from "../../../Helpers/toasts";
+import { Helmet } from "react-helmet";
 
 export default function Account() {
   const [admin, setAdmin] = useState({
@@ -214,6 +215,9 @@ export default function Account() {
   };
   return (
     <div>
+      <Helmet>
+        <title>Dashboard - Account</title>
+      </Helmet>
       {admin && admin._id ? (
         <div className="card bg-light mx-auto w-75">
           <div className="card-header">

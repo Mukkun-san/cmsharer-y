@@ -1,12 +1,17 @@
 import React from "react";
 import * as styles from "./styles.module.css";
 import "react-toastify/dist/ReactToastify.css";
+import { Helmet } from "react-helmet";
 
 export default function Home({ handleAuthClick }) {
   return (
     <div className={`${styles.home}`}>
+      <Helmet>
+        <title>CM Sharer</title>
+      </Helmet>
       <div
-        className={`card text-center mt-5 p-4 pt-5 pb-5 pr-5 pl-4 ${styles.welcomeCard}`}>
+        className={`card text-center mt-5 p-4 pt-5 pb-5 pr-5 pl-4 ${styles.welcomeCard}`}
+      >
         <div className="card-content">
           <h3>
             WELCOME TO <b>CM Sharer</b>!
@@ -26,11 +31,13 @@ export default function Home({ handleAuthClick }) {
           <div className="d-flex justify-content-center d-inline">
             <div
               className="w-auto pr-5 pl-5 d-flex btn btn-light"
-              onClick={handleAuthClick}>
+              onClick={handleAuthClick}
+            >
               <img
                 alt=""
                 src="https://img.icons8.com/plasticine/100/000000/google-logo.png"
-                style={{ height: "2.5rem" }}></img>
+                style={{ height: "2.5rem" }}
+              ></img>
               <p className="ml-4 mt-2">Sign Up With Google</p>
             </div>
           </div>
@@ -38,7 +45,8 @@ export default function Home({ handleAuthClick }) {
             className="img-fluid w-50"
             src="https://cdn.dribbble.com/users/1279501/screenshots/4922374/illustration.png"
             alt=""
-            srcSet=""></img>
+            srcSet=""
+          ></img>
           <br />
         </div>
       </div>

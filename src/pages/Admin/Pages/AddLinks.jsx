@@ -3,6 +3,7 @@ import axios from "axios";
 import { API_URL, ADMIN_TOKEN } from "../../../store/consts";
 import Toggle from "react-toggle";
 import "react-toggle/style.css";
+import { Helmet } from "react-helmet";
 
 export default function AddLinks() {
   function GoogleDrive() {
@@ -15,7 +16,7 @@ export default function AddLinks() {
     const [generatedLinks, setGeneratedLinks] = useState([]);
 
     const [inBulk, setInBulk] = useState(false);
-    const [byID, setByID] = useState(true);
+    const [byID, setByID] = useState(false);
     const [bulkLinks, setBulkLinks] = useState("");
 
     async function generateOne(e) {
@@ -45,10 +46,11 @@ export default function AddLinks() {
               getfile.result,
               { headers: { authorization: ADMIN_TOKEN } }
             );
-            if (addfile.data.message) {
+            if (addfile.data.slug) {
               setMessage(
                 <p>
-                  {addfile.data.message} <br /> <b>Link:</b>
+                  {addfile.data.msg}
+                  <br /> <b>Link:</b>
                   <a
                     target="_blank"
                     href={window.location.origin + "/d/" + addfile.data.slug}
@@ -57,29 +59,12 @@ export default function AddLinks() {
                   </a>
                 </p>
               );
-              setLink("");
-            } else {
-              if (addfile.data === "OK") {
-                setMessage(
-                  <p>
-                    Successfully generated!
-                    <br /> <b>Link:</b>
-                    <a
-                      target="_blank"
-                      href={window.location.origin + "/d/" + addfile.data.slug}
-                    >
-                      {window.location.origin + "/d/" + addfile.data.slug}
-                    </a>
-                  </p>
-                );
-                setLink("");
-              } else {
-                setMessage("Error Generating Link, please try again later.");
-              }
+            } else if (addfile.data.msg) {
+              setMessage("Internal server error");
             }
           })
           .catch((error) => {
-            setMessage("Problem generating file");
+            setMessage(error.result.error.message);
           });
       }
       setLoading(false);
@@ -119,7 +104,7 @@ export default function AddLinks() {
               );
               if (addfile.data) {
                 allLinks[idx] = {
-                  msg: addfile.data.message,
+                  msg: addfile.data.msg,
                   link: addfile.data.slug
                     ? window.location.origin + "/d/" + addfile.data.slug
                     : null,
@@ -138,7 +123,7 @@ export default function AddLinks() {
             .catch((error) => {
               loading[idx] = false;
               allLinks[idx] = {
-                msg: "Problem generating link",
+                msg: error.result.error.msg,
               };
               if (loading.every((L) => !L)) {
                 setGeneratedLinks(allLinks);
@@ -276,14 +261,14 @@ export default function AddLinks() {
                         return (
                           <div key={"yadisk-link" + i}>
                             <b>{i + 1}- </b>
-                            {L.msg}:{" "}
+                            {L.msg}
                             {L.link ? (
                               <a
                                 href={L.link}
                                 target="_blank"
                                 rel="noopener noreferrer"
                               >
-                                OPEN LINK
+                                : OPEN LINK
                               </a>
                             ) : null}
                           </div>
@@ -378,12 +363,11 @@ export default function AddLinks() {
               </p>
             );
           } else {
-            setMessage(result.data.message);
+            setMessage(result.data.msg);
           }
         })
         .catch((err) => {
-          setMessage("Error occured");
-          console.log(err);
+          setMessage("Internal Server Error");
         });
     }
 
@@ -404,8 +388,10 @@ export default function AddLinks() {
           .then((result) => {
             if (result.data) {
               allLinks[linkNb] = {
-                msg: result.data.message,
-                link: window.location.origin + "/y/" + result.data.slug,
+                msg: result.data.msg,
+                link: result.data.slug
+                  ? window.location.origin + "/y/" + result.data.slug
+                  : null,
               };
             }
             bulkLoading[linkNb] = false;
@@ -417,7 +403,7 @@ export default function AddLinks() {
             }
           })
           .catch((err) => {
-            setMessage("Error occured");
+            setMessage("Error adding link.");
           });
       });
     }
@@ -429,6 +415,9 @@ export default function AddLinks() {
 
     return (
       <div className="container">
+        <Helmet>
+          <title>Dashboard - Generate Links</title>
+        </Helmet>
         <br />
         <div className="row">
           <div className="col">
@@ -519,14 +508,14 @@ export default function AddLinks() {
                         return (
                           <div key={"yadisk-link" + i}>
                             <b>{i + 1}- </b>
-                            {L.msg}:{" "}
+                            {L.msg}
                             {L.link ? (
                               <a
                                 href={L.link}
                                 target="_blank"
                                 rel="noopener noreferrer"
                               >
-                                OPEN LINK
+                                : OPEN LINK
                               </a>
                             ) : null}
                           </div>

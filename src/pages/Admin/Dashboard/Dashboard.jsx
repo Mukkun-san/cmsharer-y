@@ -9,6 +9,7 @@ import axios from "axios";
 import { API_URL, ADMIN_TOKEN } from "../../../store/consts.js";
 import Loader from "../../../components/Loader";
 import scss from "./styles.module.scss";
+import { Helmet } from "react-helmet";
 
 export default function Dashboard() {
   const [loading, setLoading] = useState(true);
@@ -30,7 +31,8 @@ export default function Dashboard() {
         setLoading(false);
       })
       .catch((err) => {
-        console.log(err);
+        alert("Error Occured!");
+        setLoading(false);
       });
   }, []);
 
@@ -62,27 +64,23 @@ export default function Dashboard() {
               getfile.result,
               { headers: { authorization: ADMIN_TOKEN } }
             );
-            if (addfile.data.message) {
-              toastWarning(addfile.data.message);
-            } else if (addfile.data.error) {
-              toastError(addfile.data.message);
-            } else {
-              toastSuccess("Link Successfully Generated.");
+            if (addfile.data.slug) {
               setGeneratedLink(
                 window.location.origin + "/d/" + addfile.data.slug
               );
+            } else {
+              toastWarning(addfile.data.msg);
             }
-          } catch (error) {}
-
-          setTimeout(() => {
-            setLoadingMsg(false);
-            setloadingLinkGen(false);
-          }, 250);
+          } catch (error) {
+            toastError("Internal Server Error");
+          }
+          setLoadingMsg(false);
+          setloadingLinkGen(false);
         })
         .catch((err) => {
           setLoadingMsg(false);
           setloadingLinkGen(false);
-          toastError("The file is not found");
+          toastError(err.result.error.message);
         });
     } else if (link.match(yandexLinkRegExp)) {
       setloadingLinkGen(true);
@@ -94,18 +92,16 @@ export default function Dashboard() {
           { headers: { authorization: ADMIN_TOKEN } }
         )
         .then((result) => {
-          console.log(result);
           if (result.data.slug) {
             setGeneratedLink(window.location.origin + "/y/" + result.data.slug);
           } else {
-            toastWarning(result.data.message);
+            toastWarning(result.data.msg);
           }
           setloadingLinkGen(false);
         })
         .catch((err) => {
           toastError("Error occured");
           setloadingLinkGen(false);
-          console.log(err);
         });
     } else {
       toastError("Not a valid drive or yandex link");
@@ -113,6 +109,9 @@ export default function Dashboard() {
   }
   return (
     <div className={scss.textSize}>
+      <Helmet>
+        <title>Dashboard</title>
+      </Helmet>
       {loading ? (
         <Loader color="warning" />
       ) : (
@@ -213,8 +212,14 @@ export default function Dashboard() {
                         ) : null}
                         {generatedLink ? (
                           <p className="success">
-                            File Available at:{" "}
-                            <a href={generatedLink}>{generatedLink}</a>
+                            File Available at:{"   "}
+                            <a
+                              href={generatedLink}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                            >
+                              {generatedLink}
+                            </a>
                           </p>
                         ) : null}
                       </div>

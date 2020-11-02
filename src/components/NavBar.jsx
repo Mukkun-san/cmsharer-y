@@ -46,29 +46,29 @@ export default function NavBar({ currentUser }) {
         <div className="collapse navbar-collapse" id="navbarNav">
           <ul className="navbar-nav ml-auto">
             <li className="nav-item ml-3">
-              <Link className="nav-link" to="/terms&conditions">
+              <Link className="nav-link" to="/page/terms-conditions">
                 Terms & Conditions
               </Link>
             </li>
             <li className="nav-item ml-3">
-              <Link className="nav-link" to="/privacy-policy">
+              <Link className="nav-link" to="/page/privacy-policy">
                 Privacy Policy
               </Link>
             </li>
             <li className="nav-item ml-3">
-              <Link className="nav-link" to="/DMCA">
+              <Link className="nav-link" to="/page/dmca">
                 DMCA
               </Link>
             </li>
             <li className="nav-item ml-3">
-              <Link className="nav-link" to="/contact">
+              <Link className="nav-link" to="/page/contact">
                 Contact
               </Link>
             </li>
             {currentUser && currentUser.wc ? (
               <>
                 <li className="nav-item ml-3">
-                  <Link className="nav-link" to="/account">
+                  <Link className="nav-link" to="/page/account">
                     Account
                   </Link>
                 </li>

@@ -1,8 +1,12 @@
 import React from "react";
+import { Helmet } from "react-helmet";
 
 export default function DMCA() {
   return (
     <div>
+      <Helmet>
+        <title>CM Sharer - DMCA</title>
+      </Helmet>
       <div className="card text-center w-75 bg-light mx-auto mt-5 pt-5">
         <div className="card-header">
           <h1>DMCA</h1>
