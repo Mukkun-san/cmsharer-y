@@ -12,7 +12,7 @@ export default function YandexFileDownload() {
   const [file, setFile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [downloading, setDownloading] = useState(false);
-  const [ddlWait, setDdlWait] = useState(5);
+  let [ddlWait, setDdlWait] = useState(5);
 
   useEffect(() => {
     getFile();
@@ -24,8 +24,13 @@ export default function YandexFileDownload() {
         if (result.data.linkExists) {
           setFile(result.data);
           setLoading(false);
-          setInterval(() => {
-            setDdlWait(ddlWait - 1);
+          setDdlWait(ddlWait--);
+          const timer = setInterval(() => {
+            if (ddlWait < 0) {
+              clearInterval(timer);
+            } else {
+              setDdlWait(ddlWait--);
+            }
           }, 1000);
         } else {
           setLoading(false);
