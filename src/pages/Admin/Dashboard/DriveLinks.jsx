@@ -186,7 +186,6 @@ export default function DriveLinks() {
                 <a
                   className="text-black d-flex align-content-center"
                   href={window.location.origin + "/d/" + link.slug}
-                  target="_blank"
                 >
                   <Icon className="mr-2">launch</Icon>
                   Open Link
@@ -298,11 +297,7 @@ export default function DriveLinks() {
                   <TableCell align="left">{row.fileName}</TableCell>
                   <TableCell align="left">
                     {" "}
-                    <a
-                      href={"https://drive.google.com/open?id=" + row.fileId}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
+                    <a href={"https://drive.google.com/open?id=" + row.fileId}>
                       {row.fileId}
                     </a>
                   </TableCell>

@@ -185,7 +185,6 @@ export default function YandexLinks() {
                 <a
                   className="text-black d-flex align-content-center"
                   href={window.location.origin + "/y/" + link.slug}
-                  target="_blank"
                 >
                   <Icon className="mr-2">launch</Icon>
                   Open Link
@@ -296,13 +295,7 @@ export default function YandexLinks() {
                   </TableCell>
                   <TableCell align="left">{row.fileName}</TableCell>
                   <TableCell align="left">
-                    <a
-                      href={row.public_key}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      {row.public_key}
-                    </a>
+                    <a href={row.public_key}>{row.public_key}</a>
                   </TableCell>
                   <TableCell align="left">
                     {prettyBytes(Number(row.size) || 0)}

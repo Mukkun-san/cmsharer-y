@@ -292,13 +292,7 @@ export default function GDriveFileDownload({ user, handleAuthClick }) {
                 ) : (
                   <NotFound />
                 )}
-                <a
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  href=""
-                  id="DDL"
-                  style={{ visibility: "hidden", height: 0 }}
-                >
+                <a href="" id="DDL" style={{ visibility: "hidden", height: 0 }}>
                   download link placeholder
                 </a>
               </div>

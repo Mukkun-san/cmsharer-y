@@ -213,13 +213,7 @@ export default function Dashboard() {
                         {generatedLink ? (
                           <p className="success">
                             File Available at:{"   "}
-                            <a
-                              href={generatedLink}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                            >
-                              {generatedLink}
-                            </a>
+                            <a href={generatedLink}>{generatedLink}</a>
                           </p>
                         ) : null}
                       </div>

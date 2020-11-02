@@ -51,10 +51,7 @@ export default function AddLinks() {
                 <p>
                   {addfile.data.msg}
                   <br /> <b>Link:</b>
-                  <a
-                    target="_blank"
-                    href={window.location.origin + "/d/" + addfile.data.slug}
-                  >
+                  <a href={window.location.origin + "/d/" + addfile.data.slug}>
                     {window.location.origin + "/d/" + addfile.data.slug}
                   </a>
                 </p>
@@ -262,15 +259,7 @@ export default function AddLinks() {
                           <div key={"yadisk-link" + i}>
                             <b>{i + 1}- </b>
                             {L.msg}
-                            {L.link ? (
-                              <a
-                                href={L.link}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                              >
-                                : OPEN LINK
-                              </a>
-                            ) : null}
+                            {L.link ? <a href={L.link}>: OPEN LINK</a> : null}
                           </div>
                         );
                       })
@@ -354,10 +343,7 @@ export default function AddLinks() {
             setMessage(
               <p>
                 File available at:
-                <a
-                  href={window.location.origin + "/y/" + result.data.slug}
-                  target="_blank"
-                >
+                <a href={window.location.origin + "/y/" + result.data.slug}>
                   {window.location.origin + "/y/" + result.data.slug}
                 </a>
               </p>
@@ -509,15 +495,7 @@ export default function AddLinks() {
                           <div key={"yadisk-link" + i}>
                             <b>{i + 1}- </b>
                             {L.msg}
-                            {L.link ? (
-                              <a
-                                href={L.link}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                              >
-                                : OPEN LINK
-                              </a>
-                            ) : null}
+                            {L.link ? <a href={L.link}>: OPEN LINK</a> : null}
                           </div>
                         );
                       })
