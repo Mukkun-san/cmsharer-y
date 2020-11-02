@@ -12,6 +12,8 @@ export default function GDriveFileDownload({ user, handleAuthClick }) {
   const [file, setFile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [downloading, setDownloading] = useState(false);
+  let [ddlWait, setDdlWait] = useState(5);
+  const [driveInfo, setDriveInfo] = useState(null);
 
   useEffect(() => {
     setLoading(true);
@@ -32,7 +34,21 @@ export default function GDriveFileDownload({ user, handleAuthClick }) {
               })
               .then((drive) => {
                 setFile({ ...drive.result, ...res.data });
-                setLoading(false);
+                var request = window.gapi.client.drive.about.get({
+                  fields: "storageQuota",
+                });
+                request.execute(function (resp) {
+                  setDriveInfo(resp.storageQuota);
+                  setLoading(false);
+                  setDdlWait(ddlWait--);
+                  const timer = setInterval(() => {
+                    if (ddlWait < 0) {
+                      clearInterval(timer);
+                    } else {
+                      setDdlWait(ddlWait--);
+                    }
+                  }, 1000);
+                });
               })
               .catch((error) => {
                 setFile(false);
@@ -51,7 +67,7 @@ export default function GDriveFileDownload({ user, handleAuthClick }) {
   }, [slug]);
 
   function DownloadFile() {
-    function DownloadBtnIcon({ downloading }) {
+    function DownloadBtn({ downloading }) {
       if (downloading) {
         return (
           <button
@@ -67,9 +83,19 @@ export default function GDriveFileDownload({ user, handleAuthClick }) {
         );
       }
       return (
-        <button className="btn btn-info" onClick={() => download()}>
-          <i className="fa fa-download mr-3"></i>
-          Download Now
+        <button
+          className="btn btn-info"
+          onClick={() => download()}
+          disabled={ddlWait > 0 ? true : false}
+        >
+          {ddlWait > 0 ? (
+            `Please wait ${ddlWait} secs...`
+          ) : (
+            <p className="p-0 m-0">
+              <i className="fa fa-download mr-3"></i>
+              Download Now{" "}
+            </p>
+          )}
         </button>
       );
     }
@@ -155,7 +181,7 @@ export default function GDriveFileDownload({ user, handleAuthClick }) {
       <div className="row">
         <div className="col text-center">
           <div className="d-flex justify-content-center">
-            <DownloadBtnIcon downloading={downloading} />
+            <DownloadBtn downloading={downloading} />
           </div>
         </div>
       </div>
@@ -230,6 +256,33 @@ export default function GDriveFileDownload({ user, handleAuthClick }) {
                         }
                         alt="Google_Drive_logo"
                       />
+                    </div>
+                    <hr />
+                    <p className="float-left p-0 m-0 font-smaller">
+                      Free Space:{" "}
+                      {prettyBytes(
+                        Number(driveInfo.limit) - Number(driveInfo.usage)
+                      )}
+                    </p>
+                    <div
+                      className="progress"
+                      style={{ width: "100%", height: "18px" }}
+                    >
+                      <div
+                        className="progress-bar"
+                        role="progressbar"
+                        style={{
+                          width:
+                            Math.floor(
+                              (Number(driveInfo.usage) /
+                                Number(driveInfo.limit)) *
+                                100
+                            ) + "%",
+                          height: "18px",
+                        }}
+                      >
+                        {prettyBytes(Number(driveInfo.usage))} used
+                      </div>
                     </div>
                   </div>
                 ) : (
