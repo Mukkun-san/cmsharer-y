@@ -90,7 +90,7 @@ export default function YandexFileDownload() {
                       {ddlWait > 0 ? (
                         `Please wait ${ddlWait} secs...`
                       ) : (
-                        <a className="text-white" href={file.file}>
+                        <a className="text-white" href={file.public_url}>
                           Download
                         </a>
                       )}
