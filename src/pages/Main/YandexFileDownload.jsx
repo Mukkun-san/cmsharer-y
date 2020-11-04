@@ -13,6 +13,8 @@ export default function YandexFileDownload() {
   const [loading, setLoading] = useState(true);
   let [ddlWait, setDdlWait] = useState(5);
 
+  console.log(file);
+
   useEffect(() => {
     axios
       .get(API_URL + "/links/yandex/" + slug)
@@ -23,9 +25,14 @@ export default function YandexFileDownload() {
               "https://cloud-api.yandex.net/v1/disk/public/resources?public_key=" +
                 result.data.public_key
             )
-            .then((result) => {
-              console.log(result);
-              setFile(result.data);
+            .then(async (result) => {
+              let href = (
+                await axios.get(
+                  "https://cloud-api.yandex.net/v1/disk/public/resources/download?public_key=" +
+                    result.data.public_url
+                )
+              ).data.href;
+              setFile({ ...result.data, href });
               setLoading(false);
               setDdlWait(ddlWait--);
               const timer = setInterval(() => {
@@ -90,7 +97,7 @@ export default function YandexFileDownload() {
                       {ddlWait > 0 ? (
                         `Please wait ${ddlWait} secs...`
                       ) : (
-                        <a className="text-white" href={file.public_url}>
+                        <a className="text-white" href={file.href}>
                           Download
                         </a>
                       )}
