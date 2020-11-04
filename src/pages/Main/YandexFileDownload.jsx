@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useParams } from "react-router-dom";
-import { API_URL, ADMIN_TOKEN } from "../../store/consts.js";
+import { API_URL } from "../../store/consts.js";
 import NotFound from "../NotFound/NotFound";
 import Loader from "../../components/Loader";
 import prettyBytes from "pretty-bytes";
@@ -15,9 +15,7 @@ export default function YandexFileDownload() {
 
   useEffect(() => {
     axios
-      .get(API_URL + "/links/yandex/" + slug, {
-        headers: { authorization: ADMIN_TOKEN },
-      })
+      .get(API_URL + "/links/yandex/" + slug)
       .then((result) => {
         if (result.data.linkExists) {
           axios

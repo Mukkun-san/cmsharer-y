@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useParams } from "react-router-dom";
-import { API_URL, DRIVE_FOLDER_NAME, ADMIN_TOKEN } from "../../store/consts.js";
+import { API_URL, DRIVE_FOLDER_NAME } from "../../store/consts.js";
 import NotFound from "../NotFound/NotFound";
 import Loader from "../../components/Loader";
 import prettyBytes from "pretty-bytes";
@@ -22,9 +22,7 @@ export default function GDriveFileDownload({ user, handleAuthClick }) {
     }
     async function getFile() {
       axios
-        .get(API_URL + "/links/gdrive/" + slug, {
-          headers: { authorization: ADMIN_TOKEN },
-        })
+        .get(API_URL + "/links/gdrive/" + slug)
         .then((res) => {
           if (res.data.linkExists) {
             window.gapi.client.drive.files
