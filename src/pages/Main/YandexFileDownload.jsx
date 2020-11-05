@@ -90,7 +90,7 @@ export default function YandexFileDownload() {
                     />
                     <br />
                     <hr />
-                    <a href={file.href} target="_self" download>
+                    <a href={file.public_url} target="_self">
                       <button
                         className="btn btn-lg btn-warning my-0"
                         disabled={ddlWait > 0 ? true : false}
