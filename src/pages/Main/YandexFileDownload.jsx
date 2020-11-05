@@ -37,7 +37,6 @@ export default function YandexFileDownload() {
                     result.data.public_url
                 )
               ).data.href;
-              let test = (await axios.get(result.data.preview)).data.preview;
               setFile({
                 ...result.data,
                 href,
