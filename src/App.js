@@ -183,7 +183,11 @@ export default function App() {
                 handleAuthClick={handleAuthClick}
               />
             </Route>
-            <Route exact path="/y/:slug">
+            <Route
+              exact
+              path="/y/:slug"
+              onEnter={() => console.log("Entered /")}
+            >
               <NavBar currentUser={user} />
               <YandexFileDownload />
             </Route>
