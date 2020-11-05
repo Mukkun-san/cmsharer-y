@@ -103,31 +103,22 @@ export default function YandexFileDownload() {
                     ) : null}
                     <br />
                     <hr />
-                    <button
-                      className="btn btn-lg btn-warning my-0"
-                      disabled={ddlWait > 0 ? true : false}
-                      onClick={() => {
-                        document.getElementById("DDL").href = file.href;
-                        document.getElementById("DDL").click();
-                      }}
-                      type="button"
-                    >
-                      {ddlWait > 0
-                        ? `Please wait ${ddlWait} secs...`
-                        : "Download"}
-                    </button>
+                    <a href={file.public_url}>
+                      <button
+                        className="btn btn-lg btn-warning my-0"
+                        disabled={ddlWait > 0 ? true : false}
+                        type="button"
+                      >
+                        {ddlWait > 0
+                          ? `Please wait ${ddlWait} secs...`
+                          : "Download"}
+                      </button>
+                    </a>
                   </div>
                 ) : (
                   <NotFound />
                 )}
               </div>
-              <a
-                href=""
-                id="DDL"
-                style={{ opacity: 0, height: 0 }}
-                target="_self"
-                download
-              ></a>
             </div>
           </div>
         </div>
