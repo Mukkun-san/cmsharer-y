@@ -183,6 +183,8 @@ export default function YandexLinks() {
             >
               <p className="btn p-0 m-0">
                 <a
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="text-black d-flex align-content-center"
                   href={window.location.origin + "/y/" + link.slug}
                 >
@@ -295,7 +297,13 @@ export default function YandexLinks() {
                   </TableCell>
                   <TableCell align="left">{row.fileName}</TableCell>
                   <TableCell align="left">
-                    <a href={row.public_key}>{row.public_key}</a>
+                    <a
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      href={row.public_key}
+                    >
+                      {row.public_key}
+                    </a>
                   </TableCell>
                   <TableCell align="left">
                     {prettyBytes(Number(row.size) || 0)}

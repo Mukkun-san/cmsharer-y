@@ -11,7 +11,7 @@ export default function YandexFileDownload() {
   let { slug } = useParams();
   const [file, setFile] = useState(null);
   const [loading, setLoading] = useState(true);
-  let [ddlWait, setDdlWait] = useState(5);
+  let [ddlWait, setDdlWait] = useState(3);
 
   useEffect(() => {
     axios
@@ -28,6 +28,21 @@ export default function YandexFileDownload() {
                 "https://cloud-api.yandex.net/v1/disk/public/resources/download?public_key=" +
                   result.data.public_url
               );
+              // if (result.data.preview) {
+              //   var img = await fetch(
+              //     result.data.preview.replace("size=S", "size=L"),
+              //     { method: "GET" }
+              //   );
+              //   var string = "";
+              //   new Uint8Array(await img.arrayBuffer()).forEach((byte) => {
+              //     string += String.fromCharCode(byte);
+              //   });
+              //   string = btoa(string);
+              //   var base64preview = string;
+              // } else {
+              //   var base64preview = null;
+              // }
+
               return { ...result.data, ...res.data };
             })
             .then((file) => {
@@ -79,33 +94,40 @@ export default function YandexFileDownload() {
                       TYPE: {file.media_type}
                     </span>
                     <br />
-                    <img
-                      src={
-                        file.preview
-                          ? file.preview.replace("size=S", "size=L")
-                          : ""
-                      }
-                      alt="preview_image"
-                      className="my-2 w-75 mx-auto"
-                    />
+                    {file.preview ? (
+                      <img
+                        src={file.preview}
+                        alt="preview_image"
+                        className="my-2 w-75 mx-auto"
+                      />
+                    ) : null}
                     <br />
                     <hr />
-                    <a href={file.public_url} target="_self">
-                      <button
-                        className="btn btn-lg btn-warning my-0"
-                        disabled={ddlWait > 0 ? true : false}
-                        onClick={() => {}}
-                      >
-                        {ddlWait > 0
-                          ? `Please wait ${ddlWait} secs...`
-                          : "Download"}
-                      </button>
-                    </a>
+                    <button
+                      className="btn btn-lg btn-warning my-0"
+                      disabled={ddlWait > 0 ? true : false}
+                      onClick={() => {
+                        document.getElementById("DDL").href = file.href;
+                        document.getElementById("DDL").click();
+                      }}
+                      type="button"
+                    >
+                      {ddlWait > 0
+                        ? `Please wait ${ddlWait} secs...`
+                        : "Download"}
+                    </button>
                   </div>
                 ) : (
                   <NotFound />
                 )}
               </div>
+              <a
+                href=""
+                id="DDL"
+                style={{ opacity: 0, height: 0 }}
+                target="_self"
+                download
+              ></a>
             </div>
           </div>
         </div>
