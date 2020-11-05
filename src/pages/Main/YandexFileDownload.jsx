@@ -11,14 +11,9 @@ export default function YandexFileDownload() {
   let { slug } = useParams();
   const [file, setFile] = useState(null);
   const [loading, setLoading] = useState(true);
-  let [ddlWait, setDdlWait] = useState(1);
+  let [ddlWait, setDdlWait] = useState(5);
 
   console.log(file);
-
-  function redirectDDL() {
-    console.log("redirecting");
-    window.location.assign(file.href);
-  }
 
   useEffect(() => {
     axios
@@ -30,19 +25,8 @@ export default function YandexFileDownload() {
               "https://cloud-api.yandex.net/v1/disk/public/resources?public_key=" +
                 result.data.public_key
             )
-            .then(async (result) => {
-              let href = (
-                await axios.get(
-                  "https://cloud-api.yandex.net/v1/disk/public/resources/download?public_key=" +
-                    result.data.public_url
-                )
-              ).data.href;
-              setFile({
-                ...result.data,
-                href,
-                test,
-              });
-
+            .then((result) => {
+              setFile(result.data);
               setLoading(false);
               setDdlWait(ddlWait--);
               const timer = setInterval(() => {
@@ -100,19 +84,17 @@ export default function YandexFileDownload() {
                     />
                     <br />
                     <hr />
-                    <a className="text-white">
-                      <button
-                        className="btn btn-lg btn-warning my-0"
-                        disabled={ddlWait > 0 ? true : false}
-                        onClick={() => {
-                          window.location.assign(file.href);
-                        }}
-                      >
-                        {ddlWait > 0
-                          ? `Please wait ${ddlWait} secs...`
-                          : "Download"}
-                      </button>
-                    </a>
+                    <button
+                      className="btn btn-lg btn-warning my-0"
+                      disabled={ddlWait > 0 ? true : false}
+                      onClick={() => {
+                        window.location.assign(file.file);
+                      }}
+                    >
+                      {ddlWait > 0
+                        ? `Please wait ${ddlWait} secs...`
+                        : "Download"}
+                    </button>
                   </div>
                 ) : (
                   <NotFound />

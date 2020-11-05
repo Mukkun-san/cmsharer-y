@@ -235,7 +235,7 @@ export default function DriveLinks() {
     //----------------------------------------------------------
     const classes = useStyles2();
     const [page, setPage] = React.useState(0);
-    const [rowsPerPage, setRowsPerPage] = React.useState(5);
+    const [rowsPerPage, setRowsPerPage] = React.useState(10);
 
     const emptyRows =
       rowsPerPage - Math.min(rowsPerPage, links.length - page * rowsPerPage);
