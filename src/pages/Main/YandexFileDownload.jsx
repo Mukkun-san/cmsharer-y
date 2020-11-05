@@ -11,9 +11,14 @@ export default function YandexFileDownload() {
   let { slug } = useParams();
   const [file, setFile] = useState(null);
   const [loading, setLoading] = useState(true);
-  let [ddlWait, setDdlWait] = useState(5);
+  let [ddlWait, setDdlWait] = useState(1);
 
   console.log(file);
+
+  function redirectDDL() {
+    console.log("redirecting");
+    window.location.assign(file.href);
+  }
 
   useEffect(() => {
     axios
@@ -32,7 +37,13 @@ export default function YandexFileDownload() {
                     result.data.public_url
                 )
               ).data.href;
-              setFile({ ...result.data, href });
+              let test = (await axios.get(result.data.preview)).data.preview;
+              setFile({
+                ...result.data,
+                href,
+                test,
+              });
+
               setLoading(false);
               setDdlWait(ddlWait--);
               const timer = setInterval(() => {
@@ -90,18 +101,19 @@ export default function YandexFileDownload() {
                     />
                     <br />
                     <hr />
-                    <button
-                      className="btn btn-lg btn-warning my-0"
-                      disabled={ddlWait > 0 ? true : false}
-                    >
-                      {ddlWait > 0 ? (
-                        `Please wait ${ddlWait} secs...`
-                      ) : (
-                        <a className="text-white" href={file.href}>
-                          Download
-                        </a>
-                      )}
-                    </button>
+                    <a className="text-white">
+                      <button
+                        className="btn btn-lg btn-warning my-0"
+                        disabled={ddlWait > 0 ? true : false}
+                        onClick={() => {
+                          window.location.assign(file.href);
+                        }}
+                      >
+                        {ddlWait > 0
+                          ? `Please wait ${ddlWait} secs...`
+                          : "Download"}
+                      </button>
+                    </a>
                   </div>
                 ) : (
                   <NotFound />
