@@ -90,13 +90,13 @@ export default function YandexFileDownload() {
                       TYPE: {file.media_type}
                     </span>
                     <br />
-                    {file.preview ? (
+                    {/* {file.preview ? (
                       <img
                         src={file.preview}
                         alt="preview_image"
                         className="my-2 w-75 mx-auto"
                       />
-                    ) : null}
+                    ) : null} */}
                     <br />
                     <hr />
                     <a
