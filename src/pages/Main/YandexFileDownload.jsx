@@ -20,14 +20,10 @@ export default function YandexFileDownload() {
         if (result.data.linkExists) {
           axios
             .get(
-              "https://cloud-api.yandex.net/v1/disk/public/resources?public_key=" +
+              "https://cloud-api.yandex.net/v1/disk/public/resources?preview_size=XL&public_key=" +
                 result.data.public_key
             )
             .then(async (result) => {
-              let res = await axios.get(
-                "https://cloud-api.yandex.net/v1/disk/public/resources/download?public_key=" +
-                  result.data.public_url
-              );
               // if (result.data.preview) {
               //   var img = await fetch(
               //     result.data.preview.replace("size=S", "size=L"),
@@ -43,7 +39,7 @@ export default function YandexFileDownload() {
               //   var base64preview = null;
               // }
 
-              return { ...result.data, ...res.data };
+              return { ...result.data };
             })
             .then((file) => {
               console.log(file);
@@ -94,17 +90,17 @@ export default function YandexFileDownload() {
                       TYPE: {file.media_type}
                     </span>
                     <br />
-                    {/* {file.preview ? (
+                    {file.preview ? (
                       <img
                         src={file.preview}
                         alt="preview_image"
                         className="my-2 w-75 mx-auto"
                       />
-                    ) : null} */}
+                    ) : null}
                     <br />
                     <hr />
                     <a
-                      href={file.href}
+                      href={file.file}
                       target="_self"
                       type="button"
                       rel="noreferrer"
