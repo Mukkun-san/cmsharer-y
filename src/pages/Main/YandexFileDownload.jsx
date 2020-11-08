@@ -94,16 +94,21 @@ export default function YandexFileDownload() {
                       TYPE: {file.media_type}
                     </span>
                     <br />
-                    {file.preview ? (
+                    {/* {file.preview ? (
                       <img
                         src={file.preview}
                         alt="preview_image"
                         className="my-2 w-75 mx-auto"
                       />
-                    ) : null}
+                    ) : null} */}
                     <br />
                     <hr />
-                    <a href={file.public_url}>
+                    <a
+                      href={file.href}
+                      target="_self"
+                      type="button"
+                      rel="noreferrer"
+                    >
                       <button
                         className="btn btn-lg btn-warning my-0"
                         disabled={ddlWait > 0 ? true : false}
