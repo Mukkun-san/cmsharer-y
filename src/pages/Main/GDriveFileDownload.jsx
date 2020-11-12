@@ -227,7 +227,7 @@ export default function GDriveFileDownload({ user, handleAuthClick }) {
                 ) : file ? (
                   <div className="text-center">
                     <Helmet>
-                      <title>CM Sharer - {file.name}</title>
+                      <title>CM Sharer (yandex) - {file.name}</title>
                     </Helmet>
                     <h3 className="card-title font-weight-regular">
                       {file.name}

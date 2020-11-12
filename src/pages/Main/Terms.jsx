@@ -5,7 +5,7 @@ export default function Terms() {
   return (
     <div>
       <Helmet>
-        <title>CM Sharer - Terms & Conditions</title>
+        <title>CM Sharer (yandex) - Terms & Conditions</title>
       </Helmet>
       <div className="card text-center w-75 bg-light mx-auto mt-5 pt-5">
         <div className="card-header">

@@ -1,1 +1,1 @@
-"# CM Sharer - Yandex Disk Client" 
+"# CM Sharer (yandex) - Yandex Disk Client"

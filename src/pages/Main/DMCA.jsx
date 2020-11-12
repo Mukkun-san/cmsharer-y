@@ -5,7 +5,7 @@ export default function DMCA() {
   return (
     <div>
       <Helmet>
-        <title>CM Sharer - DMCA</title>
+        <title>CM Sharer (yandex) - DMCA</title>
       </Helmet>
       <div className="card text-center w-75 bg-light mx-auto mt-5 pt-5">
         <div className="card-header">

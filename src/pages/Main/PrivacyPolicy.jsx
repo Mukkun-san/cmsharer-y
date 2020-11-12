@@ -5,7 +5,7 @@ export default function PrivacyPolicy() {
   return (
     <div>
       <Helmet>
-        <title>CM Sharer - Privacy & Policy</title>
+        <title>CM Sharer (yandex) - Privacy & Policy</title>
       </Helmet>
       <div className="card text-center w-75 bg-light mx-auto mt-5 pt-5">
         <div className="card-header">

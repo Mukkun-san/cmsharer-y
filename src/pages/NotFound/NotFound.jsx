@@ -7,7 +7,7 @@ export default function NotFound() {
   return (
     <div className="container text-center w-100 py-5 my-5">
       <Helmet>
-        <title>CM Sharer - 404 NOT FOUND</title>
+        <title>CM Sharer (yandex) - 404 NOT FOUND</title>
       </Helmet>
       <div className="row">
         <div className="col-md-12">

@@ -70,7 +70,7 @@ export default function YandexFileDownload() {
     <div>
       <div className="container bg-light w-100 h-100">
         <div className="row">
-          <div className="col-8 mx-auto">
+          <div className="col-11 mx-auto">
             <div className="card card-signin my-5">
               <div className="card-body">
                 {loading ? (
@@ -80,8 +80,18 @@ export default function YandexFileDownload() {
                 ) : file ? (
                   <div className="text-center">
                     <Helmet>
-                      <title>CM Sharer - {file.name}</title>
+                      <title>CM Sharer (yandex) - {file.name}</title>
                     </Helmet>
+                    <div className="row">
+                      <div className="col">
+                        <img
+                          className="img-fluid"
+                          src="https://image.flaticon.com/icons/png/512/873/873152.png"
+                          alt="yandex icon"
+                          srcset=""
+                        />
+                      </div>
+                    </div>
                     <h3>{file.name}</h3>
                     <span className="badge badge-danger mx-2">
                       SIZE: {prettyBytes(Number(file.size) || 0)}
