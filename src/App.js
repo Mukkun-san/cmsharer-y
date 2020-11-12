@@ -5,10 +5,8 @@ import {
   Route,
   Redirect,
 } from "react-router-dom";
-import GDriveFileDownload from "./pages/Main/GDriveFileDownload";
 import YandexFileDownload from "./pages/Main/YandexFileDownload";
 import Home from "./pages/Main/Home";
-import Account from "./pages/Main/Account";
 import Contact from "./pages/Main/Contact";
 import DMCA from "./pages/Main/DMCA";
 import Terms from "./pages/Main/Terms";
@@ -16,7 +14,6 @@ import PrivacyPolicy from "./pages/Main/PrivacyPolicy";
 import NotFound from "./pages/NotFound/NotFound";
 import AdminDashboard from "./pages/Admin/Dashboard/Dashboard";
 import DashboardUsers from "./pages/Admin/Dashboard/Users";
-import DriveLinks from "./pages/Admin/Dashboard/DriveLinks";
 import YandexLinks from "./pages/Admin/Dashboard/YandexLinks";
 import AdminLogin from "./pages/Admin/Login/Login";
 import AdminAccount from "./pages/Admin/Pages/Account";
@@ -26,7 +23,6 @@ import NavBar from "./components/NavBar";
 import AdminNavBar from "./components/AdminNavBar";
 import axios from "axios";
 import { API_URL, ADMIN_TOKEN } from "./store/consts.js";
-import { CLIENT_ID, API_KEY, DISCOVERY_DOCS, SCOPES } from "./store/consts";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -34,57 +30,7 @@ export default function App() {
   const [user, setUser] = useState(null);
   const [adminIsLoggedin, setAdminIsLoggedin] = useState(null);
 
-  function gapiInit() {
-    try {
-      window.gapi.client
-        .init({
-          apiKey: API_KEY,
-          clientId: CLIENT_ID,
-          scope: SCOPES,
-          discoveryDocs: DISCOVERY_DOCS,
-        })
-        .then(() => {
-          let Oauth = window.gapi.auth2.getAuthInstance();
-          Oauth.isSignedIn.listen(() => {
-            setUser(Oauth.currentUser.get());
-            window.location.reload();
-          });
-          setUser(Oauth.currentUser.get());
-        });
-    } catch (e) {}
-  }
-
-  function handleAuthClick() {
-    window.gapi.auth2
-      .getAuthInstance()
-      .signIn()
-      .then(async (user) => {
-        let userdata = {
-          uid: user.getBasicProfile().getId(),
-          username: user.getBasicProfile().getName(),
-          email: user.getBasicProfile().getEmail(),
-          picture: user.getBasicProfile().getImageUrl(),
-        };
-        await axios.post(API_URL + "/users/addOne", userdata, {
-          headers: { authorization: ADMIN_TOKEN },
-        });
-        window.location.reload();
-      })
-      .catch((err) => {
-        window.location.reload();
-      });
-  }
-
-  function handleClientLoad() {
-    window.gapi.load("client:auth2", gapiInit);
-  }
-
   useEffect(() => {
-    var script = document.createElement("script");
-    script.onload = handleClientLoad;
-    script.src = "https://apis.google.com/js/api.js";
-    document.body.appendChild(script);
-
     adminAuth();
   });
 
@@ -104,7 +50,7 @@ export default function App() {
   return (
     <Router>
       <ToastContainer />
-      {!(window.gapi && user) || adminIsLoggedin === null ? (
+      {adminIsLoggedin === null ? (
         <div className="col d-flex justify-content-center">
           <Loader color="warning" />
         </div>
@@ -114,21 +60,11 @@ export default function App() {
             backgroundImage: 'url("./assets/1526027.jpg")',
           }}
         >
-          {/* A <Switch> looks through its children <Route>s and
-            renders the first one that matches the current URL. */}
           <Switch>
             <Route exact path="/admin/dashboard/users">
               <AdminNavBar adminIsLoggedin={adminIsLoggedin} />
               {adminIsLoggedin ? (
                 <DashboardUsers />
-              ) : (
-                <Redirect to={{ pathname: "/admin/login" }} />
-              )}
-            </Route>
-            <Route exact path="/admin/dashboard/links/drive">
-              <AdminNavBar adminIsLoggedin={adminIsLoggedin} />
-              {adminIsLoggedin ? (
-                <DriveLinks />
               ) : (
                 <Redirect to={{ pathname: "/admin/login" }} />
               )}
@@ -176,52 +112,28 @@ export default function App() {
             <Route path="/admin/">
               <Redirect to={{ pathname: "/admin/login" }} />
             </Route>
-            <Route exact path="/d/:slug">
-              <NavBar currentUser={user} />
-              <GDriveFileDownload
-                user={user}
-                handleAuthClick={handleAuthClick}
-              />
-            </Route>
             <Route
               exact
               path="/y/:slug"
               onEnter={() => console.log("Entered /")}
             >
-              <NavBar currentUser={user} />
-              <YandexFileDownload />
+              <NavBar /> <YandexFileDownload />
             </Route>
             <Route exact path="/page/privacy-policy">
-              <NavBar currentUser={user} />
-              <PrivacyPolicy />
+              <NavBar /> <PrivacyPolicy />
             </Route>
             <Route exact path="/page/dmca">
-              <NavBar currentUser={user} />
-              <DMCA />
+              <NavBar /> <DMCA />
             </Route>
             <Route exact path="/page/terms-conditions">
-              <NavBar currentUser={user} />
-              <Terms />
+              <NavBar /> <Terms />
             </Route>
             <Route exact path="/page/contact">
-              <NavBar currentUser={user} />
-              <Contact />
-            </Route>
-            <Route exact path="/page/account">
-              <NavBar currentUser={user} />
-              {user && user.Ca ? (
-                <Account user={user} />
-              ) : (
-                <Redirect to={{ pathname: "/" }} />
-              )}
+              <NavBar /> <Contact />
             </Route>
             <Route exact path="/">
-              <NavBar currentUser={user} />
-              {user && user.Ca ? (
-                <Redirect to={{ pathname: "/page/account" }} />
-              ) : (
-                <Home handleAuthClick={handleAuthClick} />
-              )}
+              <NavBar />
+              <Home />
             </Route>
             <Route path="*">
               <NotFound />

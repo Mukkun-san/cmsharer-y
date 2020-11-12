@@ -1,30 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import axios from "axios";
-import { API_URL } from "../store/consts.js";
 
-export default function NavBar({ currentUser }) {
-  function handleSignout() {
-    window.gapi.auth2.getAuthInstance().signOut();
-    window.location.reload();
-  }
-  function handleAuthClick() {
-    window.gapi.auth2
-      .getAuthInstance()
-      .signIn()
-      .then(async (res) => {
-        let userdata = {
-          uid: res.Ca,
-          username: res.nt.Ad,
-          email: res.nt.Wt,
-          picture: res.nt.JJ,
-        };
-        await axios.post(API_URL + "/users/addOne", userdata);
-        window.location.reload();
-      })
-      .catch((err) => {});
-  }
-
+export default function NavBar() {
   return (
     <div>
       <nav className="navbar navbar-dark bg-dark navbar-expand-xl">
@@ -65,38 +42,6 @@ export default function NavBar({ currentUser }) {
                 Contact
               </Link>
             </li>
-            {currentUser && currentUser.wc ? (
-              <>
-                <li className="nav-item ml-3">
-                  <Link className="nav-link" to="/page/account">
-                    Account
-                  </Link>
-                </li>
-                <i className="mr-5"></i>
-                <button
-                  className="btn btn-sm btn-outline-secondary ml-2 active"
-                  type="button"
-                  onClick={() => {
-                    handleSignout();
-                  }}
-                >
-                  Logout
-                </button>
-              </>
-            ) : (
-              <div>
-                <i className="mr-5"></i>
-                <button
-                  className="btn btn-sm btn-outline-secondary ml-2 px-3 py-2 active"
-                  type="button"
-                  onClick={() => {
-                    handleAuthClick();
-                  }}
-                >
-                  Login
-                </button>
-              </div>
-            )}
             <i className="mr-5"></i>
           </ul>
         </div>

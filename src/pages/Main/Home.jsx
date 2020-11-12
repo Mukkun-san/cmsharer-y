@@ -27,20 +27,6 @@ export default function Home({ handleAuthClick }) {
             securely on our server and we will never release your information
             unknownly. For more information
           </p>
-          <p>Just Login to your google account to use our service.</p>
-          <div className="d-flex justify-content-center d-inline">
-            <div
-              className="w-auto pr-5 pl-5 d-flex btn btn-light"
-              onClick={handleAuthClick}
-            >
-              <img
-                alt=""
-                src="https://img.icons8.com/plasticine/100/000000/google-logo.png"
-                style={{ height: "2.5rem" }}
-              ></img>
-              <p className="ml-4 mt-2">Sign Up With Google</p>
-            </div>
-          </div>
           <img
             className="img-fluid w-50"
             src="https://cdn.dribbble.com/users/1279501/screenshots/4922374/illustration.png"

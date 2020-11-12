@@ -1,10 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { DashboardCard, LinkLoader } from "./.jsx";
-import {
-  toastError,
-  toastWarning,
-  toastSuccess,
-} from "../../../Helpers/toasts";
+import { toastError, toastWarning } from "../../../Helpers/toasts";
 import axios from "axios";
 import { API_URL, ADMIN_TOKEN } from "../../../store/consts.js";
 import Loader from "../../../components/Loader";
@@ -41,49 +37,9 @@ export default function Dashboard() {
   async function generateLink() {
     setGeneratedLink(false);
     setLoadingMsg(false);
-    const driveLinkRegExp = new RegExp(
-      "^https://drive.google.com/file/d/",
-      "i"
-    );
     const yandexLinkRegExp = new RegExp("https://yadi.sk/", "i");
     if (!link) {
       toastError("Enter a drive file link to generate");
-    } else if (link.match(driveLinkRegExp)) {
-      let part1 = link.replace(driveLinkRegExp, "");
-      const fileId = part1.substring(0, part1.indexOf("/"));
-      setloadingLinkGen(true);
-      setLoadingMsg("Checking Drive File Link...");
-      window.gapi.client.drive.files
-        .get({
-          fileId,
-          fields: "id, name, size, mimeType,description, videoMediaMetadata",
-        })
-        .then(async (getfile) => {
-          setLoadingMsg("Generating File Link");
-          try {
-            let addfile = await axios.post(
-              API_URL + "/links/add/drive",
-              getfile.result,
-              { headers: { authorization: ADMIN_TOKEN } }
-            );
-            if (addfile.data.slug) {
-              setGeneratedLink(
-                window.location.origin + "/d/" + addfile.data.slug
-              );
-            } else {
-              toastWarning(addfile.data.msg);
-            }
-          } catch (error) {
-            toastError("Internal Server Error");
-          }
-          setLoadingMsg(false);
-          setloadingLinkGen(false);
-        })
-        .catch((err) => {
-          setLoadingMsg(false);
-          setloadingLinkGen(false);
-          toastError(err.result.error.message);
-        });
     } else if (link.match(yandexLinkRegExp)) {
       setloadingLinkGen(true);
       setLoadingMsg("Generating File Link");
@@ -106,7 +62,7 @@ export default function Dashboard() {
           setloadingLinkGen(false);
         });
     } else {
-      toastError("Not a valid drive or yandex link");
+      toastError("Not a valid yandex link");
     }
   }
   return (

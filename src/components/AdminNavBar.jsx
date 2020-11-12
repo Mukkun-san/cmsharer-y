@@ -41,20 +41,6 @@ export default function AdminNavBar({ adminIsLoggedin }) {
               <li className="my-auto ml-4">
                 <Link
                   className="btn btn-link"
-                  to="/admin/dashboard/links/drive"
-                >
-                  <img src="https://img.icons8.com/android/26/ffffff/google-drive.png" />
-                  <h5
-                    className="font-weight-normal text-white mt-1"
-                    style={{ fontSize: "1rem" }}
-                  >
-                    GDrive
-                  </h5>
-                </Link>
-              </li>
-              <li className="my-auto ml-4">
-                <Link
-                  className="btn btn-link"
                   to="/admin/dashboard/links/yandex"
                 >
                   <img src="https://img.icons8.com/windows/26/ffffff/yandex-international.png" />
