@@ -51,7 +51,7 @@ export default function Dashboard() {
         )
         .then((result) => {
           if (result.data.slug) {
-            setGeneratedLink(window.location.origin + "/y/" + result.data.slug);
+            setGeneratedLink(window.location.origin + "/" + result.data.slug);
           } else {
             toastWarning(result.data.msg);
           }

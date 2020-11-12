@@ -112,11 +112,7 @@ export default function App() {
             <Route path="/admin/">
               <Redirect to={{ pathname: "/admin/login" }} />
             </Route>
-            <Route
-              exact
-              path="/y/:slug"
-              onEnter={() => console.log("Entered /")}
-            >
+            <Route exact path="/:slug" onEnter={() => console.log("Entered /")}>
               <NavBar /> <YandexFileDownload />
             </Route>
             <Route exact path="/page/privacy-policy">

@@ -34,8 +34,8 @@ export default function AddLinks() {
             setMessage(
               <p>
                 File available at:
-                <a href={window.location.origin + "/y/" + result.data.slug}>
-                  {window.location.origin + "/y/" + result.data.slug}
+                <a href={window.location.origin + "/" + result.data.slug}>
+                  {window.location.origin + "/" + result.data.slug}
                 </a>
               </p>
             );
@@ -67,7 +67,7 @@ export default function AddLinks() {
               allLinks[linkNb] = {
                 msg: result.data.msg,
                 link: result.data.slug
-                  ? window.location.origin + "/y/" + result.data.slug
+                  ? window.location.origin + "/" + result.data.slug
                   : null,
               };
             }
