@@ -83,15 +83,16 @@ export default function YandexFileDownload() {
                       <title>CM Sharer (yandex) - {file.name}</title>
                     </Helmet>
                     <div className="row">
-                      <div className="col">
+                      <div className="col-8 mx-auto">
                         <img
-                          className="img-fluid"
+                          className="img-fluid w-25"
                           src="https://image.flaticon.com/icons/png/512/873/873152.png"
                           alt="yandex icon"
                           srcset=""
                         />
                       </div>
                     </div>
+                    <br />
                     <h3>{file.name}</h3>
                     <span className="badge badge-danger mx-2">
                       SIZE: {prettyBytes(Number(file.size) || 0)}
