@@ -6,6 +6,7 @@ import {
   Redirect,
 } from "react-router-dom";
 import YandexFileDownload from "./pages/Main/YandexFileDownload";
+import OpenDriveFileDownload from "./pages/Main/OpenDriveFileDownload";
 import Home from "./pages/Main/Home";
 import Contact from "./pages/Main/Contact";
 import DMCA from "./pages/Main/DMCA";
@@ -27,7 +28,6 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 export default function App() {
-  const [user, setUser] = useState(null);
   const [adminIsLoggedin, setAdminIsLoggedin] = useState(null);
 
   useEffect(() => {
@@ -112,8 +112,11 @@ export default function App() {
             <Route path="/admin/">
               <Redirect to={{ pathname: "/admin/login" }} />
             </Route>
-            <Route exact path="/:slug" onEnter={() => console.log("Entered /")}>
+            <Route exact path="/y/:slug">
               <NavBar /> <YandexFileDownload />
+            </Route>
+            <Route exact path="/o/:slug">
+              <NavBar /> <OpenDriveFileDownload />
             </Route>
             <Route exact path="/page/privacy-policy">
               <NavBar /> <PrivacyPolicy />

@@ -186,7 +186,7 @@ export default function YandexLinks() {
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-black d-flex align-content-center"
-                  href={window.location.origin + "/" + link.slug}
+                  href={window.location.origin + "/y/" + link.slug}
                 >
                   <Icon className="mr-2">launch</Icon>
                   Open Link
@@ -196,7 +196,7 @@ export default function YandexLinks() {
               <br />
               <CopyToClipboard
                 className="btn p-0 m-0 mt-2"
-                text={window.location.origin + "/" + link.slug}
+                text={window.location.origin + "/y/" + link.slug}
               >
                 <p className="btn p-0 m-0">
                   <Icon className="mr-2 mt-2">content_copy</Icon>
