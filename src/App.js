@@ -13,12 +13,13 @@ import DMCA from "./pages/Main/DMCA";
 import Terms from "./pages/Main/Terms";
 import PrivacyPolicy from "./pages/Main/PrivacyPolicy";
 import NotFound from "./pages/NotFound/NotFound";
-import AdminDashboard from "./pages/Admin/Dashboard/Dashboard";
-import DashboardUsers from "./pages/Admin/Dashboard/Users";
-import YandexLinks from "./pages/Admin/Dashboard/YandexLinks";
-import AdminLogin from "./pages/Admin/Login/Login";
-import AdminAccount from "./pages/Admin/Pages/Account";
-import AddLinks from "./pages/Admin/Pages/AddLinks";
+import AdminDashboard from "./pages/Admin/Dashboard";
+import DashboardUsers from "./pages/Admin/Users";
+import YandexLinks from "./pages/Admin/YandexLinks";
+import OpendriveLinks from "./pages/Admin/OpendriveLinks";
+import AdminLogin from "./pages/Admin/Login";
+import AdminAccount from "./pages/Admin/Account";
+import AddLinks from "./pages/Admin/AddLinks";
 import Loader from "./components/Loader";
 import NavBar from "./components/NavBar";
 import AdminNavBar from "./components/AdminNavBar";
@@ -73,6 +74,14 @@ export default function App() {
               <AdminNavBar adminIsLoggedin={adminIsLoggedin} />
               {adminIsLoggedin ? (
                 <YandexLinks />
+              ) : (
+                <Redirect to={{ pathname: "/admin/login" }} />
+              )}
+            </Route>
+            <Route exact path="/admin/dashboard/links/opendrive">
+              <AdminNavBar adminIsLoggedin={adminIsLoggedin} />
+              {adminIsLoggedin ? (
+                <OpendriveLinks />
               ) : (
                 <Redirect to={{ pathname: "/admin/login" }} />
               )}

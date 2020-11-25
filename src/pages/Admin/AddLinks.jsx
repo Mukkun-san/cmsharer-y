@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { API_URL, ADMIN_TOKEN } from "../../../store/consts";
+import { API_URL, ADMIN_TOKEN } from "../../store/consts";
 import Toggle from "react-toggle";
 import "react-toggle/style.css";
 import { Helmet } from "react-helmet";
@@ -100,7 +100,7 @@ export default function AddLinks() {
           <div className="col">
             <div className="col-12 m-3">
               <img
-                src={require("../../../assets/yandex-disk-logo.png")}
+                src={require("../../assets/yandex-disk-logo.png")}
                 width="40"
                 alt="drive-logo"
               />
@@ -303,36 +303,49 @@ export default function AddLinks() {
       bulkLinks.split("\n").forEach((link, linkNb) => {
         bulkLoading.push(true);
         allLinks.push({});
-        axios
-          .post(
-            API_URL + "/links/add/opendrive",
-            {
-              fileId: link
-                .trim()
-                .match(new RegExp("^https://www.opendrive.com/file/", "i")),
-            },
-            { headers: { authorization: ADMIN_TOKEN } }
-          )
-          .then((result) => {
-            if (result.data) {
-              allLinks[linkNb] = {
-                msg: result.data.msg,
-                link: result.data.slug
-                  ? window.location.origin + "/o/" + result.data.slug
-                  : null,
-              };
-            }
-            bulkLoading[linkNb] = false;
-            if (bulkLoading.every((x) => !x)) {
-              setBulkLoading(false);
-              setGeneratedLinks(allLinks);
-              window.bulklinks = allLinks;
-              console.log("finished:", generatedLinks);
-            }
-          })
-          .catch((err) => {
-            setMessage("Error adding link.");
-          });
+        if (
+          link &&
+          link.length &&
+          link.trim().match(new RegExp("^https://www.opendrive.com/file/", "i"))
+        ) {
+          axios
+            .post(
+              API_URL + "/links/add/opendrive",
+              {
+                fileId: link
+                  .trim()
+                  .replace(
+                    new RegExp("^https://www.opendrive.com/file/", "i"),
+                    ""
+                  ),
+              },
+              { headers: { authorization: ADMIN_TOKEN } }
+            )
+            .then((result) => {
+              if (result.data) {
+                allLinks[linkNb] = {
+                  msg: result.data.msg,
+                  link: result.data.slug
+                    ? window.location.origin + "/o/" + result.data.slug
+                    : null,
+                };
+              }
+              bulkLoading[linkNb] = false;
+              if (bulkLoading.every((x) => !x)) {
+                setBulkLoading(false);
+                setGeneratedLinks(allLinks);
+                window.bulklinks = allLinks;
+                console.log("finished:", generatedLinks);
+              }
+            })
+            .catch((err) => {
+              setMessage("Error adding link.");
+            });
+        } else {
+          allLinks[linkNb] = {
+            msg: "link invalid",
+          };
+        }
       });
     }
 

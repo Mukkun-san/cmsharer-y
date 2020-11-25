@@ -1,12 +1,8 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { API_URL, ADMIN_TOKEN } from "../../../store/consts";
-import Loader from "../../../components/Loader";
-import {
-  toastError,
-  toastWarning,
-  toastSuccess,
-} from "../../../Helpers/toasts";
+import { API_URL, ADMIN_TOKEN } from "../../store/consts";
+import Loader from "../../components/Loader";
+import { toastError, toastWarning, toastSuccess } from "../../Helpers/toasts";
 import { Helmet } from "react-helmet";
 
 export default function Account() {
