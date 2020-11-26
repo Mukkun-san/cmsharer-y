@@ -417,7 +417,7 @@ export default function OpenDriveLinks() {
   return (
     <div>
       <Helmet>
-        <title>Dashboard - Links - Yandex</title>
+        <title>Dashboard - Links - OpenDrive</title>
       </Helmet>
       <br />
       <br />
